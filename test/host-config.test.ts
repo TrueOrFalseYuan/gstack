@@ -226,6 +226,35 @@ describe('validateHostConfig', () => {
     c.suppressedResolvers = ['TYPO_RESOLVER'];
     expect(validateHostConfig(c)).toEqual([]);
   });
+
+  test('invalid defaultModel is caught', () => {
+    const c = makeValid();
+    (c as HostConfig & { defaultModel: string }).defaultModel = 'gpt-future';
+    expect(validateHostConfig(c).some(e => e.includes('defaultModel'))).toBe(true);
+  });
+
+  test('invalid question-tool limits are caught', () => {
+    const c = makeValid();
+    c.questionTool = {
+      name: 'request-user-input',
+      maxQuestions: 0,
+      maxOptions: 1,
+      autoOther: 'yes' as unknown as boolean,
+      supportsHooks: 0 as unknown as boolean,
+    };
+    const errors = validateHostConfig(c);
+    expect(errors.some(e => e.includes('questionTool.name'))).toBe(true);
+    expect(errors.some(e => e.includes('maxQuestions'))).toBe(true);
+    expect(errors.some(e => e.includes('maxOptions'))).toBe(true);
+    expect(errors.some(e => e.includes('autoOther'))).toBe(true);
+    expect(errors.some(e => e.includes('supportsHooks'))).toBe(true);
+  });
+
+  test('invalid planFinalization is caught', () => {
+    const c = makeValid();
+    (c as HostConfig & { planFinalization: string }).planFinalization = 'legacy-tool';
+    expect(validateHostConfig(c).some(e => e.includes('planFinalization'))).toBe(true);
+  });
 });
 
 // ─── validateAllConfigs ─────────────────────────────────────
@@ -484,6 +513,26 @@ describe('host config correctness', () => {
   test('codex has sidecar config', () => {
     expect(codex.sidecar).toBeDefined();
     expect(codex.sidecar!.path).toBe('.agents/skills/gstack');
+  });
+
+  test('codex declares GPT-5.6 Sol and native interaction capabilities', () => {
+    expect(codex.defaultModel).toBe('gpt-5.6-sol');
+    expect(codex.questionTool).toEqual({
+      name: 'request_user_input',
+      maxQuestions: 3,
+      maxOptions: 3,
+      autoOther: true,
+      supportsHooks: false,
+    });
+    expect(codex.planFinalization).toBe('proposed-plan');
+  });
+
+  test('codex rewrites Claude-only question, plan, and instruction-file names', () => {
+    expect(codex.toolRewrites![' OR `CONDUCTOR_SESSION: true`']).toBe('');
+    expect(codex.toolRewrites!['AskUserQuestion']).toBe('request_user_input');
+    expect(codex.toolRewrites!['ExitPlanMode']).toBe('Codex plan finalization');
+    expect(codex.pathRewrites[0]).toEqual({ from: 'CLAUDE.md / AGENTS.md', to: 'AGENTS.md' });
+    expect(codex.pathRewrites[1]).toEqual({ from: 'CLAUDE.md', to: 'AGENTS.md' });
   });
 
   test('factory has tool rewrites', () => {

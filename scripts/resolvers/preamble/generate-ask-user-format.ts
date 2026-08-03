@@ -1,6 +1,54 @@
 import type { TemplateContext } from '../types';
+import { getHostConfig } from '../../../hosts/index';
 
-export function generateAskUserFormat(_ctx: TemplateContext): string {
+function generateCodexQuestionFormat(ctx: TemplateContext): string {
+  const tool = getHostConfig(ctx.host).questionTool!;
+  return `## ${tool.name} Format
+
+Use the native \`${tool.name}\` tool when it is listed and a material user
+decision is required. Do not probe for Claude tools or MCP variants.
+
+### Native tool contract
+
+- Each call carries 1-${tool.maxQuestions} questions; each question carries 2-${tool.maxOptions}
+  mutually exclusive choices. Respect skill STOP points: normally ask one
+  question, and batch only independent decisions the skill explicitly permits.
+- Use a stable \`snake_case\` id, a header of at most 12 characters, and a concise
+  question. Labels are 1-5 words; descriptions are one short sentence.
+- Put the recommended option first and suffix its label with \`(Recommended)\`.
+  The client adds free-form Other automatically; never add an Other option.
+- Preserve the user's language and values. Ask only what cannot be discovered
+  from the repo or safely inferred.
+
+This host limit overrides any later instruction to send four choices through a
+tool. For 4+ real choices, do not drop, merge, or hide any choice. Render one
+compact prose decision brief instead: \`D<N>\` title, the issue and stakes, a
+\`Recommendation:\` line, then every labeled choice with a one-line impact.
+Tell the user the exact label to reply with, then STOP. Do not split the choice
+into extra tool round trips unless the skill requires independent sequential
+decisions.
+
+For irreversible actions, state what cannot be recovered and require the exact
+choice label. Never accept a vague acknowledgement.
+
+### Unavailable or failed tool
+
+- \`interactive\`: use the same compact prose brief and wait.
+- \`headless\`: report \`BLOCKED — ${tool.name} unavailable\`.
+- \`spawned\`: auto-select the recommended option only for safe, reversible
+  decisions; block on destructive or one-way decisions.
+
+Retry a failed call once only when no question could have reached the user.
+Never double-prompt. An auto-decide preference result is an answer, not a tool
+failure. A \`${tool.name}\` call or its prose fallback satisfies a plan-mode STOP;
+do not continue until an answer exists.`;
+}
+
+export function generateAskUserFormat(ctx: TemplateContext): string {
+  if (getHostConfig(ctx.host).questionTool?.name === 'request_user_input') {
+    return generateCodexQuestionFormat(ctx);
+  }
+
   return `## AskUserQuestion Format
 
 ### Tool resolution (read first)
