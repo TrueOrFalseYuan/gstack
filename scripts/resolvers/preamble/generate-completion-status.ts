@@ -1,4 +1,5 @@
 import type { TemplateContext } from '../types';
+import { getHostConfig } from '../../../hosts/index';
 
 /**
  * Plan-mode-skill semantics block.
@@ -19,7 +20,24 @@ import type { TemplateContext } from '../types';
  * gates. See ceo-plan 2026-04-24 "remove vestigial plan-mode handshake" for
  * the full rationale.
  */
-export function generatePlanModeInfo(_ctx: TemplateContext): string {
+export function generatePlanModeInfo(ctx: TemplateContext): string {
+  if (getHostConfig(ctx.host).planFinalization === 'proposed-plan') {
+    return `## Plan Mode Safe Operations
+
+In plan mode, inspect files, search, run read-only commands, and execute tests or
+builds that only write caches/artifacts. Do not edit repo-tracked files.
+
+## Skill Invocation During Plan Mode
+
+The skill workflow and its STOP points remain authoritative. Use
+\`request_user_input\` when available; its answer or the documented prose fallback
+satisfies the wait-for-user gate. At a STOP point, stop immediately.
+
+Do not look for host-specific plan-file variables or invoke a plan-exit tool.
+When the workflow is decision-complete, return exactly one
+\`<proposed_plan>\` block. Do not write a plan file as a substitute.`;
+  }
+
   return `## Plan Mode Safe Operations
 
 In plan mode, allowed because they inform the plan: \`$B\`, \`$D\`, \`codex exec\`/\`codex review\`, writes to \`~/.gstack/\`, writes to the plan file, and \`open\` for generated artifacts.
@@ -30,6 +48,16 @@ If the user invokes a skill in plan mode, the skill takes precedence over generi
 }
 
 export function generateCompletionStatus(ctx: TemplateContext): string {
+  const planFooter = getHostConfig(ctx.host).planFinalization === 'proposed-plan'
+    ? `## Plan Status Footer
+
+Plan-review skills incorporate their final review report into the single
+\`<proposed_plan>\` response. Verify every required gate before returning it; do
+not invoke a plan-exit tool or require a host-provided plan file.`
+    : `## Plan Status Footer
+
+Skills that run plan reviews (\`/plan-*-review\`, \`/codex review\`) include the EXIT PLAN MODE GATE blocking checklist at the end of the skill, which verifies the plan file ends with \`## GSTACK REVIEW REPORT\` before ExitPlanMode is called. Skills that don't run plan reviews (operational skills like \`/ship\`, \`/qa\`, \`/review\`) typically don't operate in plan mode and have no review report to verify; this footer is a no-op for them. Writing the plan file is the one edit allowed in plan mode.`;
+
   return `## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
@@ -79,7 +107,5 @@ fi
 
 Replace \`SKILL_NAME\`, \`OUTCOME\`, and \`USED_BROWSE\` before running.
 
-## Plan Status Footer
-
-Skills that run plan reviews (\`/plan-*-review\`, \`/codex review\`) include the EXIT PLAN MODE GATE blocking checklist at the end of the skill, which verifies the plan file ends with \`## GSTACK REVIEW REPORT\` before ExitPlanMode is called. Skills that don't run plan reviews (operational skills like \`/ship\`, \`/qa\`, \`/review\`) typically don't operate in plan mode and have no review report to verify; this footer is a no-op for them. Writing the plan file is the one edit allowed in plan mode.`;
+${planFooter}`;
 }

@@ -32,6 +32,60 @@ function makeCtx(): TemplateContext {
   };
 }
 
+function makeCodexCtx(): TemplateContext {
+  return {
+    skillName: 'test-skill',
+    tmplPath: 'test.tmpl',
+    host: 'codex',
+    paths: HOST_PATHS.codex,
+    preambleTier: 2,
+    model: 'gpt-5.6-sol',
+  };
+}
+
+describe('generateAskUserFormat — Codex request_user_input contract', () => {
+  const out = generateAskUserFormat(makeCodexCtx());
+
+  test('uses the native Codex tool and its exact limits', () => {
+    expect(out).toContain('## request_user_input Format');
+    expect(out).toContain('1-3 questions');
+    expect(out).toContain('2-3');
+    expect(out).toContain('mutually exclusive choices');
+    expect(out).toContain('`snake_case` id');
+    expect(out).toContain('at most 12 characters');
+    expect(out).toContain('Labels are 1-5 words');
+  });
+
+  test('preserves native recommendation and automatic Other semantics', () => {
+    expect(out).toContain('(Recommended)');
+    expect(out).toContain('client adds free-form Other automatically');
+    expect(out).toContain('never add an Other option');
+  });
+
+  test('keeps all 4+ choices in one prose brief instead of extra calls', () => {
+    expect(out).toContain('For 4+ real choices');
+    expect(out).toMatch(/do not drop, merge, or hide any choice/i);
+    expect(out).toContain('every labeled choice');
+    expect(out).toContain('then STOP');
+    expect(out).toMatch(/Do not split[\s\S]*extra tool round trips/i);
+  });
+
+  test('documents safe fallback behavior without Claude-only machinery', () => {
+    expect(out).toContain('`interactive`');
+    expect(out).toContain('`headless`');
+    expect(out).toContain('`spawned`');
+    expect(out).toContain('destructive or one-way decisions');
+    expect(out).not.toContain('AskUserQuestion');
+    expect(out).not.toContain('mcp__');
+    expect(out).not.toContain('CONDUCTOR_SESSION');
+    expect(out).not.toContain('ELI10');
+  });
+
+  test('stays within the 3 KB Codex question-format budget', () => {
+    expect(Buffer.byteLength(out, 'utf8')).toBeLessThanOrEqual(3_000);
+  });
+});
+
 describe('generateAskUserFormat — v1.7.0.0 Pros/Cons format', () => {
   const out = generateAskUserFormat(makeCtx());
 

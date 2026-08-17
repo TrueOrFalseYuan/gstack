@@ -10,6 +10,15 @@ const codex: HostConfig = {
   localSkillRoot: '.agents/skills/gstack',
   hostSubdir: '.agents',
   usesEnvVars: true,
+  defaultModel: 'gpt-5.6-sol',
+  questionTool: {
+    name: 'request_user_input',
+    maxQuestions: 3,
+    maxOptions: 3,
+    autoOther: true,
+    supportsHooks: false,
+  },
+  planFinalization: 'proposed-plan',
 
   frontmatter: {
     mode: 'allowlist',
@@ -25,11 +34,25 @@ const codex: HostConfig = {
   },
 
   pathRewrites: [
+    { from: 'CLAUDE.md / AGENTS.md', to: 'AGENTS.md' },
+    { from: 'CLAUDE.md', to: 'AGENTS.md' },
     { from: '~/.claude/skills/gstack', to: '$GSTACK_ROOT' },
     { from: '.claude/skills/gstack', to: '.agents/skills/gstack' },
     { from: '.claude/skills/review', to: '.agents/skills/gstack/review' },
     { from: '.claude/skills', to: '.agents/skills' },
   ],
+
+  toolRewrites: {
+    ' OR `CONDUCTOR_SESSION: true`': '',
+    'AskUserQuestion with 4 options': 'the documented 4-option prose fallback',
+    'Before calling ExitPlanMode': 'Before returning the final `<proposed_plan>` block',
+    'Before ExitPlanMode is called': 'Before the final `<proposed_plan>` block is returned',
+    'calling ExitPlanMode': 'returning the final `<proposed_plan>` block',
+    'call ExitPlanMode': 'return the final `<proposed_plan>` block',
+    'EXIT PLAN MODE GATE': 'FINAL PLAN GATE',
+    'ExitPlanMode': 'Codex plan finalization',
+    'AskUserQuestion': 'request_user_input',
+  },
 
   suppressedResolvers: [
     'DESIGN_OUTSIDE_VOICES',  // design.ts:485 — Codex can't invoke itself

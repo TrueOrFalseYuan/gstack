@@ -58,10 +58,12 @@ describe('Preamble composition order', () => {
     expect(formatIdx).toBeLessThan(overlayIdx);
   });
 
-  test('AskUserQuestion Format renders before Model-Specific Behavioral Patch (codex host)', () => {
-    const out = generatePreamble(makeCtx('codex', 2, 'opus-4-7'));
-    const formatIdx = out.indexOf('## AskUserQuestion Format');
+  test('request_user_input Format renders before GPT-5.6 Sol behavioral patch (codex host)', () => {
+    const out = generatePreamble(makeCtx('codex', 2, 'gpt-5.6-sol'));
+    const formatIdx = out.indexOf('## request_user_input Format');
     const overlayIdx = out.indexOf('## Model-Specific Behavioral Patch');
+    expect(formatIdx).toBeGreaterThan(-1);
+    expect(overlayIdx).toBeGreaterThan(-1);
     expect(formatIdx).toBeLessThan(overlayIdx);
   });
 

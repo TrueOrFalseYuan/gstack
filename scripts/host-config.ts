@@ -1,3 +1,18 @@
+import { validateModel, type Model } from './models';
+
+export interface QuestionToolConfig {
+  /** Runtime tool name exposed by the host. */
+  name: string;
+  /** Maximum questions allowed in one tool call. */
+  maxQuestions: number;
+  /** Maximum choices allowed for each question. */
+  maxOptions: number;
+  /** Whether the host automatically appends a free-form Other choice. */
+  autoOther: boolean;
+  /** Whether host hooks observe and can rewrite question calls. */
+  supportsHooks: boolean;
+}
+
 /**
  * Declarative host config system.
  *
@@ -33,6 +48,15 @@ export interface HostConfig {
   hostSubdir: string;
   /** Whether preamble generates $GSTACK_ROOT env vars (true for non-Claude hosts). */
   usesEnvVars: boolean;
+
+  /** Model overlay used when --model is omitted. Explicit CLI selection wins. */
+  defaultModel?: Model;
+
+  /** Interactive-question capabilities for host-aware prompt generation. */
+  questionTool?: QuestionToolConfig;
+
+  /** How a plan-mode workflow returns its final result. */
+  planFinalization?: 'exit-tool' | 'proposed-plan';
 
   // --- Frontmatter Transformation ---
   frontmatter: {
@@ -144,6 +168,30 @@ export function validateHostConfig(config: HostConfig, validResolverNames?: Read
   }
   if (!PATH_REGEX.test(config.hostSubdir)) {
     errors.push(`hostSubdir '${config.hostSubdir}' contains invalid characters`);
+  }
+  if (config.defaultModel) {
+    const modelError = validateModel(config.defaultModel);
+    if (modelError) errors.push(`defaultModel ${modelError}`);
+  }
+  if (config.questionTool) {
+    if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(config.questionTool.name)) {
+      errors.push(`questionTool.name '${config.questionTool.name}' is invalid`);
+    }
+    if (!Number.isInteger(config.questionTool.maxQuestions) || config.questionTool.maxQuestions < 1) {
+      errors.push('questionTool.maxQuestions must be a positive integer');
+    }
+    if (!Number.isInteger(config.questionTool.maxOptions) || config.questionTool.maxOptions < 2) {
+      errors.push('questionTool.maxOptions must be an integer >= 2');
+    }
+    if (typeof config.questionTool.autoOther !== 'boolean') {
+      errors.push('questionTool.autoOther must be a boolean');
+    }
+    if (typeof config.questionTool.supportsHooks !== 'boolean') {
+      errors.push('questionTool.supportsHooks must be a boolean');
+    }
+  }
+  if (config.planFinalization && !['exit-tool', 'proposed-plan'].includes(config.planFinalization)) {
+    errors.push(`planFinalization '${config.planFinalization}' is invalid`);
   }
   if (!['allowlist', 'denylist'].includes(config.frontmatter.mode)) {
     errors.push(`frontmatter.mode must be 'allowlist' or 'denylist'`);
