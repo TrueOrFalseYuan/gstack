@@ -1,6 +1,12 @@
 ## Review Sections (after scope is agreed)
 
+<!-- codex-astra -->
+Evaluate each review dimension against the actual target. Record evidence for
+findings and a short reason for inapplicable dimensions. Do not invent findings,
+inflate a small plan, or repeat completed analysis just to populate a checklist.
+<!-- otherwise -->
 **Anti-skip rule:** Never condense, abbreviate, or skip any review section (1-4) regardless of plan type (strategy, spec, code, infra). Every section in this skill exists for a reason. "This is a strategy doc so implementation sections don't apply" is always wrong — implementation details are where strategy breaks down. If a section genuinely has zero findings, say "No issues found" and move on — but you must evaluate it.
+<!-- /codex-astra -->
 
 {{ANTI_SHORTCUT_CLAUSE}}
 
@@ -17,9 +23,20 @@ Evaluate:
 * For each new codepath or integration point, describe one realistic production failure scenario and whether the plan accounts for it.
 * **Distribution architecture:** If this introduces a new artifact (binary, package, container), how does it get built, published, and updated? Is the CI/CD pipeline part of the plan or deferred?
 
+<!-- codex-astra -->
+Report concrete findings; use the material-decision rules below when a choice is needed.
+<!-- otherwise -->
 For each issue found in this section, call AskUserQuestion individually. One issue per call. Present options, state your recommendation, explain WHY. Do NOT batch multiple issues into one AskUserQuestion. Use the preamble's AskUserQuestion Format section. The AskUserQuestion call is a tool_use, not prose — call the tool directly.
+<!-- /codex-astra -->
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed to the next review section, edit the plan file with the proposed fix, or call ExitPlanMode until the user responds. An issue with an "obvious fix" is still an issue and still needs explicit user approval before it lands in the plan. Loading the AskUserQuestion schema via ToolSearch and then writing the recommendation as chat prose is the failure mode this gate exists to prevent.
+<!-- /codex-astra -->
 
 {{CONFIDENCE_CALIBRATION}}
 
@@ -32,9 +49,20 @@ Evaluate:
 * Areas that are over-engineered or under-engineered relative to my preferences.
 * Existing ASCII diagrams in touched files — are they still accurate after this change?
 
+<!-- codex-astra -->
+Report concrete findings; use the material-decision rules below when a choice is needed.
+<!-- otherwise -->
 For each issue found in this section, call AskUserQuestion individually. One issue per call. Present options, state your recommendation, explain WHY. Do NOT batch multiple issues into one AskUserQuestion. Use the preamble's AskUserQuestion Format section. The AskUserQuestion call is a tool_use, not prose — call the tool directly.
+<!-- /codex-astra -->
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed to the next review section, edit the plan file with the proposed fix, or call ExitPlanMode until the user responds. An issue with an "obvious fix" is still an issue and still needs explicit user approval before it lands in the plan. Loading the AskUserQuestion schema via ToolSearch and then writing the recommendation as chat prose is the failure mode this gate exists to prevent.
+<!-- /codex-astra -->
 
 ### 3. Test review
 
@@ -42,9 +70,20 @@ For each issue found in this section, call AskUserQuestion individually. One iss
 
 For LLM/prompt changes: check the "Prompt/LLM changes" file patterns listed in CLAUDE.md. If this plan touches ANY of those patterns, state which eval suites must be run, which cases should be added, and what baselines to compare against. Then use AskUserQuestion to confirm the eval scope with the user.
 
+<!-- codex-astra -->
+Report concrete findings; use the material-decision rules below when a choice is needed.
+<!-- otherwise -->
 For each issue found in this section, call AskUserQuestion individually. One issue per call. Present options, state your recommendation, explain WHY. Do NOT batch multiple issues into one AskUserQuestion. Use the preamble's AskUserQuestion Format section. The AskUserQuestion call is a tool_use, not prose — call the tool directly.
+<!-- /codex-astra -->
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed to the next review section, edit the plan file with the proposed fix, or call ExitPlanMode until the user responds. An issue with an "obvious fix" is still an issue and still needs explicit user approval before it lands in the plan. Loading the AskUserQuestion schema via ToolSearch and then writing the recommendation as chat prose is the failure mode this gate exists to prevent.
+<!-- /codex-astra -->
 
 ### 4. Performance review
 Evaluate:
@@ -53,12 +92,31 @@ Evaluate:
 * Caching opportunities.
 * Slow or high-complexity code paths.
 
+<!-- codex-astra -->
+Report concrete findings; use the material-decision rules below when a choice is needed.
+<!-- otherwise -->
 For each issue found in this section, call AskUserQuestion individually. One issue per call. Present options, state your recommendation, explain WHY. Do NOT batch multiple issues into one AskUserQuestion. Use the preamble's AskUserQuestion Format section. The AskUserQuestion call is a tool_use, not prose — call the tool directly.
+<!-- /codex-astra -->
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed to the next review section, edit the plan file with the proposed fix, or call ExitPlanMode until the user responds. An issue with an "obvious fix" is still an issue and still needs explicit user approval before it lands in the plan. Loading the AskUserQuestion schema via ToolSearch and then writing the recommendation as chat prose is the failure mode this gate exists to prevent.
+<!-- /codex-astra -->
 
 {{CODEX_PLAN_REVIEW}}
 
+<!-- codex-astra -->
+### Outside voice integration
+
+Check external findings against the actual plan. Incorporate verified routine
+corrections within accepted scope; ask about material choices or scope changes.
+Attribute each review to the model/tool actually used. Unavailable outside review
+is a stated limitation and cannot be presented as cross-model consensus.
+<!-- otherwise -->
 ### Outside Voice Integration Rule
 
 Outside voice findings are INFORMATIONAL until the user explicitly approves each one.
@@ -67,6 +125,19 @@ finding via AskUserQuestion and getting explicit approval. This applies even whe
 agree with the outside voice. Cross-model consensus is a strong signal — present it as
 such — but the user makes the decision.
 
+<!-- /codex-astra -->
+<!-- codex-astra -->
+## Material decisions
+
+Use the common User decisions rules. Ground a question in a concrete finding and
+its consequence, with relevant file or design references. Offer viable choices and
+recommend one with its effort, risk and tradeoffs. Batch independent choices within
+the host's question schema; do not require a separate approval for every finding.
+Preserve settled scope, product direction and real unresolved decisions. Do not
+manufacture numerical completeness scores or ask the user to endorse clear facts.
+For visual preferences, use the comparison board when available; accept explicit
+text feedback and ask only when the choice remains ambiguous.
+<!-- otherwise -->
 ## CRITICAL RULE — How to ask questions
 Follow the AskUserQuestion format from the Preamble above. Additional rules for plan reviews:
 * **One issue = one AskUserQuestion call.** Never combine multiple issues into one question.
@@ -78,6 +149,7 @@ Follow the AskUserQuestion format from the Preamble above. Additional rules for 
 * **Coverage vs kind:** for every per-issue AskUserQuestion you raise in this review, decide whether the options differ in coverage or in kind. If coverage (e.g., more tests vs fewer, complete error handling vs happy-path-only, full edge-case coverage vs shortcut), include `Completeness: N/10` on each option. If kind (e.g., architectural choice between two different systems, posture-over-posture, A/B/C where each is a different kind of thing), skip the score and add one line: `Note: options differ in kind, not coverage — no completeness score.` Do NOT fabricate scores on kind-differentiated questions — filler scores are worse than no score.
 * **Zero findings:** if a section has zero findings, state "No issues, moving on" and proceed. Otherwise, use AskUserQuestion for each finding — a finding with an "obvious fix" is still a finding and still needs user approval before any change lands in the plan.
 
+<!-- /codex-astra -->
 ## Required outputs
 
 ### "NOT in scope" section
@@ -87,7 +159,12 @@ Every plan review MUST produce a "NOT in scope" section listing work that was co
 List existing code/flows that already partially solve sub-problems in this plan, and whether the plan reuses them or unnecessarily rebuilds them.
 
 ### TODOS.md updates
+<!-- codex-astra -->
+Collect deferred work with rationale. Ask about TODOs only when they change
+accepted scope or require a material priority decision; batch independent choices.
+<!-- otherwise -->
 After all review sections are complete, present each potential TODO as its own individual AskUserQuestion. Never batch TODOs — one per question. Never silently skip this step. Follow the format in `.claude/skills/review/TODOS-format.md`.
+<!-- /codex-astra -->
 
 For each TODO, describe:
 * **What:** One-line description of the work.
@@ -114,7 +191,13 @@ If any failure mode has no test AND no error handling AND would be silent, flag 
 
 ### Worktree parallelization strategy
 
+<!-- codex-astra -->
+Analyze independent implementation steps and shared-file conflicts. Recommend
+parallel work only when it helps; use the host's actual delegation and workspace
+capabilities. Planning work allocation does not start implementation agents.
+<!-- otherwise -->
 Analyze the plan's implementation steps for parallel execution opportunities. This helps the user split work across git worktrees (via Claude Code's Agent tool with `isolation: "worktree"` or parallel workspaces).
+<!-- /codex-astra -->
 
 **Skip if:** all steps touch the same primary module, or the plan has fewer than 2 independent workstreams. In that case, write: "Sequential implementation, no parallelization opportunity."
 
@@ -165,6 +248,14 @@ Check the git log for this branch. If there are prior commits suggesting a previ
 * One sentence max per option. Pick in under 5 seconds.
 * After each review section, pause and ask for feedback before moving on.
 
+<!-- codex-astra -->
+## Review record
+
+In plan mode, include review status and evidence in the final proposed plan. Do
+not write a plan file or persistent review log. In execution mode, record review
+results using the project's configured workflow when authorized; logging failure
+does not erase the review or require the user to rerun it.
+<!-- otherwise -->
 ## Review Log
 
 After producing the Completion Summary above, persist the review result.
@@ -203,6 +294,7 @@ Substitute values from the Completion Summary:
 
 {{BRAIN_CACHE_REFRESH}}
 
+<!-- /codex-astra -->
 ## Next Steps — Review Chaining
 
 After displaying the Review Readiness Dashboard, check if additional reviews would be valuable. Read the dashboard output to see which reviews have already been run and whether they are stale.

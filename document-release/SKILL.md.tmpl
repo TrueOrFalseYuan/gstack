@@ -147,7 +147,12 @@ When significant gaps are found, suggest running `/document-generate` to fill th
 
 - **Read before editing.** Always read the full content of a file before modifying it.
 - **Never clobber CHANGELOG.** Polish wording only. Never delete, replace, or regenerate entries.
+<!-- codex-astra -->
+- Respect the approved version decision and verify that it matches release scope.
+  Ask only when a new or changed version decision remains unresolved.
+<!-- otherwise -->
 - **Never bump VERSION silently.** Always ask. Even if already bumped, check whether it covers the full scope of changes.
+<!-- /codex-astra -->
 - **Be explicit about what changed.** Every edit gets a one-line summary.
 - **Generic heuristics, not project-specific.** The audit checks work on any repo.
 - **Discoverability matters.** Every doc file should be reachable from README or CLAUDE.md.

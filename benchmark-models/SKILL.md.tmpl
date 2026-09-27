@@ -47,6 +47,23 @@ If not found, stop and tell the user to reinstall gstack.
 
 ---
 
+<!-- codex-astra -->
+## Steps 1-3: Resolve the benchmark
+
+Use the prompt or generated skill selected by the user. For an Astra skill, select
+the Codex/Astra generated output, not the Claude source. Resolve requested providers,
+model and judge preference together; ask only for missing consequential choices.
+`--models` selects providers; `--gpt-model gpt-6-astra` selects Astra explicitly.
+Preserve configured reasoning effort and record it in the comparison context.
+Run `--dry-run` first to check availability and show the selected configuration.
+Authentication availability is not proof a particular model is accessible.
+
+Run only the authorized providers and paid judge. If no provider is usable, report
+that blocker. Never silently benchmark the CLI's default model while labeling it
+Astra. Unknown pricing stays unknown and cannot win a cheapest-model comparison.
+For instruction comparisons, keep model, reasoning, task and environment fixed;
+vary only the old versus Astra skill profile, using isolated workspaces.
+<!-- otherwise -->
 ## Step 1: Choose a prompt
 
 Use AskUserQuestion with the preamble format:
@@ -103,12 +120,17 @@ If judge is NOT available, skip this question and omit the `--judge` flag.
 
 ---
 
+<!-- /codex-astra -->
 ## Step 4: Run the benchmark
 
 Construct the command from Step 1, 2, 3 decisions:
 
 ```bash
+<!-- codex-astra -->
+"$BIN" <prompt-spec> --models <picked-providers> --gpt-model gpt-6-astra [--judge] --output table
+<!-- otherwise -->
 "$BIN" <prompt-spec> --models <picked-models> [--judge] --output table
+<!-- /codex-astra -->
 ```
 
 Where `<prompt-spec>` is either `--prompt "<text>"` (Step 1B), a file path (Step 1A or 1C), and `<picked-models>` is the comma-separated list from Step 2.

@@ -18,6 +18,7 @@ export const ALL_MODEL_NAMES = [
   'gpt',
   'gpt-5.4',
   'gpt-5.6-sol',
+  'gpt-6-astra',
   'gemini',
   'o-series',
 ] as const;
@@ -30,6 +31,7 @@ export type Model = (typeof ALL_MODEL_NAMES)[number];
  * Precedence rules:
  * 1. Exact match against ALL_MODEL_NAMES → return as-is.
  * 2. Family heuristics for common variants:
+ *    - `gpt-6-astra-*` → `gpt-6-astra` (bare GPT-6 and siblings stay generic)
  *    - `gpt-5.6`, `gpt-5.6-sol`, `gpt-5.6-sol-*` → `gpt-5.6-sol`
  *    - `gpt-5.4-mini`, `gpt-5.4-turbo`, `gpt-5.4-*` → `gpt-5.4`
  *    - `gpt-*` (anything else GPT) → `gpt`
@@ -52,6 +54,7 @@ export function resolveModel(input: string): Model | null {
   }
 
   // Family heuristics
+  if (/^gpt-6-astra-/.test(s)) return 'gpt-6-astra';
   if (/^gpt-5\.6(?:-sol(?:-|$)|$)/.test(s)) return 'gpt-5.6-sol';
   if (/^gpt-5\.4(-|$)/.test(s)) return 'gpt-5.4';
   if (/^gpt(-|$)/.test(s)) return 'gpt';

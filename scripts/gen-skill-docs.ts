@@ -22,6 +22,7 @@ import { externalSkillName, extractHookSafetyProse as _extractHookSafetyProse, e
 import { generatePlanCompletionAuditShip, generatePlanCompletionAuditReview, generatePlanVerificationExec } from './resolvers/review';
 import { ALL_HOST_CONFIGS, ALL_HOST_NAMES, resolveHostArg, getHostConfig } from '../hosts/index';
 import type { HostConfig } from './host-config';
+import { isCodexAstra, selectAstraVariants, ASTRA_NATIVE_REVIEWS, generateAstraNativeReview } from './resolvers/astra';
 
 const ROOT = path.resolve(import.meta.dir, '..');
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -157,7 +158,8 @@ const EXPLAIN_LEVEL: 'default' | 'terse' = (() => {
 // generated content to point at the out-dir, so section Reads resolve to the
 // rendered copy rather than the global install. Used by bin/dev-setup to render
 // the gbrain `:user` variant for a Conductor workspace without dirtying tracked
-// source. Default (unset) = in-place, behavior unchanged. Claude host only.
+// source. External hosts render their skill directories under out-dir; with
+// --host all, each external host retains its hostSubdir/skills namespace.
 const OUT_DIR_ARG = process.argv.find(a => a.startsWith('--out-dir'));
 const OUT_DIR: string | null = (() => {
   if (!OUT_DIR_ARG) return null;
@@ -181,6 +183,13 @@ function rewriteSectionBase(content: string): string {
     /~\/\.claude\/skills\/gstack\/([^\s)`"'*]+\/sections\/)/g,
     `${OUT_DIR}/$1`,
   );
+}
+
+function externalOutputRoot(hostConfig: HostConfig): string {
+  if (!OUT_DIR) return path.join(ROOT, hostConfig.hostSubdir, 'skills');
+  return HOST_ARG_VAL === 'all'
+    ? path.join(OUT_DIR, hostConfig.hostSubdir, 'skills')
+    : OUT_DIR;
 }
 
 // HostPaths, HOST_PATHS, and TemplateContext imported from ./resolvers/types (line 7-8)
@@ -650,6 +659,13 @@ function extractHookSafetyProse(tmplContent: string): string | null {
 
 const GENERATED_HEADER = `<!-- AUTO-GENERATED from {{SOURCE}} — do not edit directly -->\n<!-- Regenerate: bun run gen:skill-docs -->\n`;
 
+function generatedHeader(source: string, ctx: TemplateContext): string {
+  const header = GENERATED_HEADER.replace('{{SOURCE}}', source);
+  return isCodexAstra(ctx)
+    ? header.replace('bun run gen:skill-docs -->', 'bun run gen:skill-docs --host codex --model gpt-6-astra -->')
+    : header;
+}
+
 /**
  * Apply a host's configured path + tool rewrites. Extracted so both SKILL.md
  * (via processExternalHost) and section files (via processSectionTemplate) get
@@ -686,10 +702,13 @@ function resolvePlaceholders(
   // section generation so both paths get the same gbrain-aware behavior.
   const suppressed = effectiveSuppressedResolvers(hostConfig);
   const onePass = (input: string): string =>
-    input.replace(/\{\{(\w+(?::[^}]+)?)\}\}/g, (_match, fullKey) => {
+    selectAstraVariants(input, ctx).replace(/\{\{(\w+(?::[^}]+)?)\}\}/g, (_match, fullKey) => {
       const parts = fullKey.split(':');
       const resolverName = parts[0];
       const args = parts.slice(1);
+      if (isCodexAstra(ctx) && ASTRA_NATIVE_REVIEWS.has(resolverName)) {
+        return generateAstraNativeReview(resolverName);
+      }
       if (suppressed.has(resolverName)) return '';
       const entry = RESOLVERS[resolverName];
       if (!entry) throw new Error(`Unknown placeholder {{${resolverName}}} in ${relTmplPath}`);
@@ -758,12 +777,12 @@ function processExternalHost(
   extractedDescription: string,
   ctx: TemplateContext,
   frontmatterName?: string,
-): { content: string; outputPath: string; outputDir: string; symlinkLoop: boolean } {
+): { content: string; outputPath: string; outputDir: string; symlinkLoop: boolean; metadataStale: boolean } {
   const hostConfig = getHostConfig(host);
 
   const name = externalSkillName(skillDir === '.' ? '' : skillDir, frontmatterName);
-  const outputDir = path.join(ROOT, hostConfig.hostSubdir, 'skills', name);
-  fs.mkdirSync(outputDir, { recursive: true });
+  const outputDir = path.join(externalOutputRoot(hostConfig), name);
+  if (!DRY_RUN) fs.mkdirSync(outputDir, { recursive: true });
   const outputPath = path.join(outputDir, 'SKILL.md');
 
   // Guard against symlink loops
@@ -780,7 +799,7 @@ function processExternalHost(
   }
 
   // Extract hook safety prose BEFORE transforming frontmatter (which strips hooks)
-  const safetyProse = extractHookSafetyProse(tmplContent);
+  const safetyProse = isCodexAstra(ctx) ? null : extractHookSafetyProse(tmplContent);
 
   // Transform frontmatter (host-aware)
   let result = transformFrontmatter(content, host);
@@ -796,17 +815,23 @@ function processExternalHost(
   result = applyHostRewrites(result, hostConfig);
 
   // Config-driven: generate metadata (e.g., openai.yaml for Codex)
+  let metadataStale = false;
   if (hostConfig.generation.generateMetadata && !symlinkLoop) {
     const agentsDir = path.join(outputDir, 'agents');
-    fs.mkdirSync(agentsDir, { recursive: true });
     const shortDescription = condenseOpenAIShortDescription(extractedDescription);
-    fs.writeFileSync(path.join(agentsDir, 'openai.yaml'), generateOpenAIYaml(name, shortDescription));
+    const metadataPath = path.join(agentsDir, 'openai.yaml');
+    const metadata = generateOpenAIYaml(name, shortDescription);
+    metadataStale = !fs.existsSync(metadataPath) || fs.readFileSync(metadataPath, 'utf8') !== metadata;
+    if (!DRY_RUN) {
+      fs.mkdirSync(agentsDir, { recursive: true });
+      fs.writeFileSync(metadataPath, metadata);
+    }
   }
 
-  return { content: result, outputPath, outputDir, symlinkLoop };
+  return { content: result, outputPath, outputDir, symlinkLoop, metadataStale };
 }
 
-function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath: string; content: string; symlinkLoop?: boolean; catalogParts?: CatalogParts | null } {
+function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath: string; content: string; symlinkLoop?: boolean; metadataStale?: boolean; catalogParts?: CatalogParts | null } {
   const tmplContent = fs.readFileSync(tmplPath, 'utf-8');
   const relTmplPath = path.relative(ROOT, tmplPath);
   let outputPath = tmplPath.replace(/\.tmpl$/, '');
@@ -845,6 +870,7 @@ function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath:
   // For Claude: strip sensitive: field (only Factory uses it)
   // For external hosts: route output, transform frontmatter, rewrite paths
   let symlinkLoop = false;
+  let metadataStale = false;
   if (host === 'claude') {
     content = transformFrontmatter(content, host);
   } else {
@@ -852,10 +878,11 @@ function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath:
     content = result.content;
     outputPath = result.outputPath;
     symlinkLoop = result.symlinkLoop;
+    metadataStale = result.metadataStale;
   }
 
   // Prepend generated header (after frontmatter)
-  const header = GENERATED_HEADER.replace('{{SOURCE}}', path.basename(tmplPath));
+  const header = generatedHeader(path.basename(tmplPath), ctx);
   const fmEnd = content.indexOf('---', content.indexOf('---') + 3);
   if (fmEnd !== -1) {
     const insertAt = content.indexOf('\n', fmEnd) + 1;
@@ -877,7 +904,7 @@ function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath:
   // --out-dir: repoint section-base paths to the out-dir (no-op otherwise).
   if (host === 'claude') content = rewriteSectionBase(content);
 
-  return { outputPath, content, symlinkLoop, catalogParts };
+  return { outputPath, content, symlinkLoop, metadataStale, catalogParts };
 }
 
 /**
@@ -922,7 +949,7 @@ function processSectionTemplate(
   }
 
   // Plain generated header (no frontmatter to insert after).
-  content = GENERATED_HEADER.replace('{{SOURCE}}', path.basename(sectionTmplPath)) + content;
+  content = generatedHeader(path.basename(sectionTmplPath), ctx) + content;
 
   const fileName = path.basename(sectionTmplPath).replace(/\.tmpl$/, '');
   let outputPath: string;
@@ -930,7 +957,7 @@ function processSectionTemplate(
     outputPath = path.join(OUT_DIR || ROOT, skillDir, 'sections', fileName);
   } else {
     const externalName = externalSkillName(skillDir, parentName);
-    outputPath = path.join(ROOT, hostConfig.hostSubdir, 'skills', externalName, 'sections', fileName);
+    outputPath = path.join(externalOutputRoot(hostConfig), externalName, 'sections', fileName);
   }
   if (!DRY_RUN) fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   return { outputPath, content };
@@ -974,7 +1001,7 @@ for (const currentHost of hostsToRun) {
         if (currentHostConfig.generation.skipSkills.includes(dir)) continue;
       }
 
-      const { outputPath, content, symlinkLoop, catalogParts } = processTemplate(tmplPath, currentHost);
+      const { outputPath, content, symlinkLoop, metadataStale, catalogParts } = processTemplate(tmplPath, currentHost);
       if (catalogParts) {
         // Root-skill detection: when the template lives at ROOT/SKILL.md.tmpl,
         // path.basename(path.dirname(tmplPath)) returns the repo's directory
@@ -998,7 +1025,7 @@ for (const currentHost of hostsToRun) {
         console.log(`SKIPPED (symlink loop): ${relOutput}`);
       } else if (DRY_RUN) {
         const existing = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, 'utf-8') : '';
-        if (existing !== content) {
+        if (existing !== content || metadataStale) {
           console.log(`STALE: ${relOutput}`);
           hasChanges = true;
         } else {
@@ -1031,13 +1058,9 @@ for (const currentHost of hostsToRun) {
     }
 
     // ─── Section generation (v2 plan T9, Claude-first carve) ───
-    // On-demand sections/*.md for carved skills. Generated for CLAUDE ONLY:
-    // every other host inlines section content via the {{SECTION:id}} resolver
-    // (keeping the full monolith skill), so they need no section files and we
-    // sidestep host-portable section paths until that plumbing lands. No-op for
-    // any skill without a sections/ dir. Mirrors the SKILL.md DRY_RUN handling so
-    // sections participate in the freshness gate.
-    for (const sec of currentHost === 'claude' ? discoverSectionTemplates(ROOT) : []) {
+    // Claude and opt-in Codex/Astra load sections on demand. Other profiles keep
+    // their existing inline output. Sections use the same freshness contract.
+    for (const sec of currentHost === 'claude' || isCodexAstra({ host: currentHost, model: modelForHost(currentHost) }) ? discoverSectionTemplates(ROOT) : []) {
       if (currentHostConfig.generation.includeSkills?.length &&
           !currentHostConfig.generation.includeSkills.includes(sec.skillDir)) continue;
       if (currentHostConfig.generation.skipSkills?.length &&
@@ -1068,7 +1091,7 @@ for (const currentHost of hostsToRun) {
 
     // Generate gstack-lite and gstack-full for OpenClaw host
     if (currentHost === 'openclaw' && !DRY_RUN) {
-      const openclawDir = path.join(ROOT, 'openclaw');
+      const openclawDir = path.join(OUT_DIR || ROOT, 'openclaw');
       if (!fs.existsSync(openclawDir)) fs.mkdirSync(openclawDir, { recursive: true });
 
       const gstackLite = `# gstack-lite Planning Discipline
@@ -1199,14 +1222,14 @@ The orchestrator will persist the plan link to its own memory/knowledge store.
 // section that failed to generate for Factory) slip through the freshness gate
 // silently. With sections fanned out across every host, "all hosts regenerated
 // in the same commit" is only a real gate if every host failure is fatal here.
-if (failures.length > 0 && HOST_ARG_VAL === 'all') {
+if (failures.length > 0) {
   console.error(`\n${failures.length} host(s) failed: ${failures.map(f => f.host).join(', ')}`);
   process.exit(1);
 }
 // Single host dry-run failure already handled above
 
 // After all hosts processed, warn if prefix patches may need re-applying
-if (!DRY_RUN) {
+if (!DRY_RUN && !OUT_DIR) {
   try {
     const configPath = path.join(process.env.HOME || '', '.gstack', 'config.yaml');
     if (fs.existsSync(configPath)) {
@@ -1224,7 +1247,7 @@ if (!DRY_RUN) {
 // this module async (test/gen-skill-docs.test.ts uses require() to pull
 // extractVoiceTriggers/processVoiceTriggers, which fails on async modules).
 // Freshness is asserted in test/llms-txt-shape.test.ts.
-if (!DRY_RUN) {
+if (!DRY_RUN && !OUT_DIR) {
   void (async () => {
     try {
       const result = await writeLlmsTxt();

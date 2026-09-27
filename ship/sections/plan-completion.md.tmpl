@@ -1,7 +1,14 @@
 ## Step 8: Plan Completion Audit
 
+<!-- codex-astra -->
+Use a permitted native reviewer when available for this bounded read-only task;
+otherwise run the same checks sequentially. The instructions and result fields
+below apply in either case. Do not fabricate Claude Agent parameters or an
+independent review. Preserve all findings and subsequent release gates.
+<!-- otherwise -->
 **Dispatch this step as a subagent** using the Agent tool with `subagent_type: "general-purpose"`. The subagent reads the plan file and every referenced code file in its own fresh context. Parent gets only the conclusion.
 
+<!-- /codex-astra -->
 **Subagent prompt:** Pass these instructions to the subagent:
 
 > You are running a ship-workflow plan completion audit. The base branch is `<base>`. Use `git diff <base>...HEAD` to see what shipped. Do not commit or push — report only.

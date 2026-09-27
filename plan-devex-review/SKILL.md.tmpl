@@ -192,7 +192,14 @@ Tolerance: [how many minutes/steps before they abandon]
 Expects:   [what they assume exists before trying]
 ```
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed until user responds. This persona shapes the entire review.
+<!-- /codex-astra -->
 
 ### 0B. Empathy Narrative as Conversation Starter
 
@@ -216,7 +223,14 @@ Then SHOW it to the user via AskUserQuestion:
 > B) Some of this is wrong, let me correct it
 > C) This is way off, the actual experience is..."
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Incorporate corrections into the narrative. This narrative becomes a required
+<!-- /codex-astra -->
 output section ("Developer Perspective") in the plan file. The implementer should read
 it and feel what the developer feels.
 
@@ -259,7 +273,14 @@ AskUserQuestion:
 > C) Current trajectory ([X] min) -- acceptable for now, improve later
 > D) Tell me what's realistic for our constraints"
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** The chosen tier becomes the benchmark for Pass 1 (Getting Started).
+<!-- /codex-astra -->
 
 ### 0D. Magical Moment Design
 
@@ -300,7 +321,14 @@ AskUserQuestion:
 > RECOMMENDATION: [A/B/C/D] because for [persona], [reason]. Your competitor [name]
 > uses [their approach]."
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** The chosen delivery vehicle is tracked through the scoring passes.
+<!-- /codex-astra -->
 
 ### 0E. Mode Selection
 
@@ -332,7 +360,14 @@ Context-dependent defaults:
 
 Once selected, commit fully. Do not silently drift toward a different mode.
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed until user responds.
+<!-- /codex-astra -->
 
 ### 0F. Developer Journey Trace with Friction-Point Questions
 
@@ -352,7 +387,11 @@ For each stage (Discover, Install, Hello World, Real Usage, Debug, Upgrade):
    error or nothing]."
 
 3. **AskUserQuestion per friction point.** One question per friction point found.
+<!-- codex-astra -->
+   Batch independent friction decisions within the host question schema.
+<!-- otherwise -->
    Do NOT batch multiple friction points into one question.
+<!-- /codex-astra -->
 
    > "Journey Stage: INSTALL
    >
@@ -421,7 +460,14 @@ AskUserQuestion:
 > C) The critical ones (#[N], #[N]) -- skip the rest
 > D) This is unrealistic -- our developers already know [context]"
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed until user responds.
+<!-- /codex-astra -->
 
 ---
 

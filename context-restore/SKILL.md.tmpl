@@ -152,6 +152,17 @@ If the current branch differs from the saved context's branch, note this:
 "This context was saved on branch `{branch}`. You are currently on
 `{current branch}`. You may want to switch branches before continuing."
 
+<!-- codex-astra -->
+### Step 3: Resume according to the request
+
+If the user asked to resume work, verify the checkpoint against current branch and
+working-tree state, then continue the next authorized item. Do not merely suggest
+starting it. If the request was only to inspect saved context, stop after the summary.
+Ask only if the saved scope conflicts with the current request or the target branch
+is genuinely ambiguous. Do not switch branches or overwrite local changes blindly.
+
+---
+<!-- otherwise -->
 ### Step 3: Offer next steps
 
 After presenting, ask via AskUserQuestion:
@@ -164,6 +175,7 @@ If A, summarize the first remaining work item and suggest starting there.
 
 ---
 
+<!-- /codex-astra -->
 ## If no saved contexts exist
 
 If Step 1 printed `NO_CHECKPOINTS`, tell the user:
@@ -184,4 +196,8 @@ state, then `/context-restore` will find it."
   `ls -1t` (filesystem mtime). Filenames are stable across file-system
   operations; mtime is not.
 - **This is a gstack skill, not a Claude Code built-in.** When the user types
+<!-- codex-astra -->
+  `/context-restore`, load this skill through the host's available skill mechanism.
+<!-- otherwise -->
   `/context-restore`, invoke this skill via the Skill tool.
+<!-- /codex-astra -->

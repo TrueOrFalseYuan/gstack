@@ -7,7 +7,8 @@
  *
  *  - On CLAUDE: {{SECTION:id}} emits a STOP-Read pointer to the generated section
  *    file (the skeleton), and the section .md is generated + installed separately.
- *  - On every OTHER host: {{SECTION:id}} INLINES the section template's content,
+ *  - On Codex/Astra: a portable pointer relative to the owning SKILL.md.
+ *  - On every OTHER profile: {{SECTION:id}} INLINES the section template's content,
  *    so external hosts keep the full monolith ship skill (no section files, no
  *    host-portable-path problem). Inlined content keeps its own {{RESOLVER}}
  *    tokens, which the generator's multi-pass resolve expands.
@@ -20,6 +21,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { ResolverFn, TemplateContext } from './types';
+import { isCodexAstra } from './astra';
 
 const ROOT = path.resolve(import.meta.dir, '..', '..');
 
@@ -58,6 +60,10 @@ export const SECTION: ResolverFn = (ctx: TemplateContext, args?: string[]): stri
   if (!id) throw new Error('{{SECTION:id}} requires a section id');
   const entry = findSection(ctx.skillName, id);
 
+  if (isCodexAstra(ctx)) {
+    return `Read \`sections/${entry.file}\` relative to this skill's SKILL.md before ${entry.trigger}. Load it once and apply its checks; this is a reference-loading step, not a request for user approval.`;
+  }
+
   if (ctx.host === 'claude') {
     const sectionPath = `${ctx.paths.skillRoot}/${ctx.skillName}/sections/${entry.file}`;
     return [
@@ -77,7 +83,7 @@ export const SECTION: ResolverFn = (ctx: TemplateContext, args?: string[]): stri
  * Claude only; other hosts inline everything so an index would be noise.
  */
 export const SECTION_INDEX: ResolverFn = (ctx: TemplateContext, args?: string[]): string => {
-  if (ctx.host !== 'claude') return '';
+  if (ctx.host !== 'claude' && !isCodexAstra(ctx)) return '';
   const skill = args?.[0] ?? ctx.skillName;
   const manifest = loadManifest(skill);
   const lines: string[] = [

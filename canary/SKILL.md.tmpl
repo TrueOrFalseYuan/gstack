@@ -146,6 +146,16 @@ After each check, compare results against the baseline (or pre-deploy snapshot):
 
 **Don't cry wolf.** Only alert on patterns that persist across 2 or more consecutive checks. A single transient network blip is not an alert.
 
+<!-- codex-astra -->
+If a CRITICAL or HIGH alert persists, present the page, time, baseline, current
+result and screenshot evidence. Offer investigate, continue, rollback or dismiss
+without hiding choices to fit a tool schema. Prefer an available asynchronous
+question tool, continuing independent read-only checks while the answer is pending.
+Without async input, emit the alert and continue the authorized monitoring window;
+ask for required remediation authority before any mutation. Silence never authorizes
+rollback. Stop monitoring only on the user's choice, completed duration, or an actual
+inability to observe the target. Record unresolved alerts in the final report.
+<!-- otherwise -->
 **If a CRITICAL or HIGH alert is detected**, immediately notify the user via AskUserQuestion:
 
 ```
@@ -167,6 +177,7 @@ Current:  [current value]
 - C) Rollback — revert the deploy immediately
 - D) Dismiss — false positive, continue monitoring
 
+<!-- /codex-astra -->
 ### Phase 6: Health Report
 
 After monitoring completes (or if the user stops early), produce a summary:

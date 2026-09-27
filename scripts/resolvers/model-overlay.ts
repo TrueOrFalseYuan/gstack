@@ -19,6 +19,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { TemplateContext } from './types';
+import { isCodexAstra } from './astra';
 
 const OVERLAY_DIR = path.resolve(import.meta.dir, '../../model-overlays');
 
@@ -48,6 +49,10 @@ export function generateModelOverlay(ctx: TemplateContext): string {
 
   const content = readOverlay(ctx.model);
   if (!content) return '';
+
+  if (isCodexAstra(ctx)) {
+    return `## Model-Specific Behavioral Patch (${ctx.model})\n\n${content}`;
+  }
 
   return `## Model-Specific Behavioral Patch (${ctx.model})
 

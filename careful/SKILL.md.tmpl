@@ -1,12 +1,19 @@
 ---
 name: careful
 version: 0.1.0
+<!-- codex-astra -->
+description: |
+  Check destructive commands before execution.
+  Instruction-level guidance for Codex; host sandbox and approval rules still apply.
+  Use when the user requests /careful. (gstack)
+<!-- otherwise -->
 description: |
   Safety guardrails for destructive commands. Warns before rm -rf, DROP TABLE,
   force-push, git reset --hard, kubectl delete, and similar destructive operations.
   User can override each warning. Use when touching prod, debugging live systems,
   or working in a shared environment. Use when asked to "be careful", "safety mode",
   "prod mode", or "careful mode". (gstack)
+<!-- /codex-astra -->
 triggers:
   - be careful
   - warn before destructive
@@ -24,6 +31,22 @@ hooks:
 sensitive: true
 ---
 
+<!-- codex-astra -->
+{{PREAMBLE}}
+
+# /careful — Destructive command checks
+
+Apply the user's requested caution before destructive commands: recursive deletion,
+database drops/truncation, history rewrites, discarding work, production deletion,
+and destructive container cleanup. Inspect the concrete target and consequences.
+Preserve explicit approval already given for the same action and scope; ask before
+an unapproved destructive action. Routine disposable build artifacts can be cleaned
+within the authorized task after verifying their location and contents.
+
+This Codex skill supplies instruction-level checks. It does not install or claim a
+Claude PreToolUse hook, and does not replace the host's sandbox or approval policy.
+Report the active caution scope concisely. Honor a later user request to change it.
+<!-- otherwise -->
 # /careful — Destructive Command Guardrails
 
 Safety mode is now **active**. Every bash command will be checked for destructive
@@ -60,3 +83,4 @@ patterns above, and returns `permissionDecision: "ask"` with a warning message
 if a match is found. You can always override the warning and proceed.
 
 To deactivate, end the conversation or start a new one. Hooks are session-scoped.
+<!-- /codex-astra -->

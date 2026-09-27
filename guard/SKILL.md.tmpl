@@ -1,12 +1,19 @@
 ---
 name: guard
 version: 0.1.0
+<!-- codex-astra -->
+description: |
+  Apply an explicit directory scope to edits and check destructive commands.
+  Instruction-level guidance for Codex; host sandbox and approval rules still apply.
+  Use when the user requests /guard. (gstack)
+<!-- otherwise -->
 description: |
   Full safety mode: destructive command warnings + directory-scoped edits.
   Combines /careful (warns before rm -rf, DROP TABLE, force-push, etc.) with
   /freeze (blocks edits outside a specified directory). Use for maximum safety
   when touching prod or debugging live systems. Use when asked to "guard mode",
   "full safety", "lock it down", or "maximum safety". (gstack)
+<!-- /codex-astra -->
 triggers:
   - full safety mode
   - guard against mistakes
@@ -35,6 +42,28 @@ hooks:
 sensitive: true
 ---
 
+<!-- codex-astra -->
+{{PREAMBLE}}
+
+# /guard — Explicit edit scope
+
+Use the directory specified in the request. If missing or ambiguous, ask for it
+using the host's text-capable question mechanism or prose; do not invent choices.
+Resolve it to a canonical absolute directory and show the concrete scope. Save it
+with a trailing slash in freeze-dir.txt under GSTACK_STATE_ROOT obtained from
+`$GSTACK_BIN/gstack-paths`. Reuse an already-set scope when that matches the request.
+
+Before edits or writes, including shell edits, verify their resolved paths remain
+inside the directory. Resolve symlinks so an in-scope link cannot silently target an
+out-of-scope file. Ask for an explicit scope change if the task needs files outside it.
+`/unfreeze` clears this gstack restriction. It does not relax host permissions.
+
+This is an instruction-level constraint in Codex. No Claude Edit/Write hook is
+installed and no tool-level hard block is promised. Report that limitation plainly.
+
+Also apply /careful checks before destructive actions, preserving existing
+authorization for the exact action and scope.
+<!-- otherwise -->
 # /guard — Full Safety Mode
 
 Activates both destructive command warnings and directory-scoped edit restrictions.
@@ -84,3 +113,4 @@ Tell the user:
 
 See `/careful` for the full list of destructive command patterns and safe exceptions.
 See `/freeze` for how edit boundary enforcement works.
+<!-- /codex-astra -->

@@ -35,6 +35,14 @@ to find missing design decisions and ADD THEM TO THE PLAN before implementation.
 
 The output of this skill is a better plan, not a document about the plan.
 
+<!-- codex-astra -->
+## Review target
+
+Use the plan, files, branch or request already identified by the user. Inspect
+available context before asking. If several plausible targets remain and choosing
+one changes the review, ask one concise target question, then wait for that answer.
+Do not re-confirm an explicit target or a target settled earlier in the conversation.
+<!-- otherwise -->
 ## Scope gate (FIRST — overrides everything below). This is a hard STOP.
 
 Before ANYTHING else in this skill — before the designer/mockup guidance, the Design Principles, the Priority Hierarchy, the pre-review system audit, and any `git` / `Read` / `Grep` / `Glob` / `Bash` call or mockup generation — unless an exception below applies, your VERY FIRST tool call MUST be AskUserQuestion, to confirm the review target. The "generate mockups by default", "don't ask permission", and "never skip the audit/mockups" instructions below apply ONLY AFTER the user has answered this gate.
@@ -58,6 +66,7 @@ C) A specific page, file, or path.
 
 Recommendation: A when a branch diff exists, otherwise B. Reply with A, B, or C. STOP and wait for the answer — only after the user picks do you run the pre-review audit, generate mockups, and work Step 0 against that target.
 
+<!-- /codex-astra -->
 ## Design Philosophy
 
 You are not here to rubber-stamp this plan's UI. You are here to ensure that when
@@ -132,7 +141,11 @@ Never skip Step 0 or mockup generation (when the designer is available). Mockups
 
 ## PRE-REVIEW SYSTEM AUDIT (before Step 0)
 
+<!-- codex-astra -->
+> Review the target established above; reuse the user's explicit selection.
+<!-- otherwise -->
 > Reminder: the **Scope gate** at the top of this skill applies first. Do not run this audit until the gate has resolved a target — the user answered, the user named one, or plan mode auto-selected B.
+<!-- /codex-astra -->
 
 Before reviewing the plan, gather context:
 
@@ -189,7 +202,14 @@ What existing UI patterns, components, or design decisions in the codebase shoul
 ### 0D. Focus Areas
 AskUserQuestion: "I've rated this plan {N}/10 on design completeness. The biggest gaps are {X, Y, Z}. I'll generate visual mockups next, then review all 7 dimensions. Want me to focus on specific areas instead of all 7?"
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed until user responds.
+<!-- /codex-astra -->
 
 ## Step 0.5: Visual Mockups (DEFAULT when DESIGN_READY)
 

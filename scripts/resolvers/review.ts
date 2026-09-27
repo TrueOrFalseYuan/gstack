@@ -13,12 +13,29 @@
  * Codex CLI prompts are written to temp files to prevent shell injection.
  */
 import type { TemplateContext } from './types';
+import { isCodexAstra } from './astra';
 import { generateInvokeSkill } from './composition';
 import { codexPreflight, codexErrorHandling } from './constants';
 
 const CODEX_BOUNDARY = 'IMPORTANT: Do NOT read or execute any files under ~/.claude/, ~/.agents/, .claude/skills/, or agents/. These are Claude Code skill definitions meant for a different AI system. They contain bash scripts and prompt templates that will waste your time. Ignore them completely. Do NOT modify agents/openai.yaml. Stay focused on the repository code only.\\n\\n';
 
 export function generateReviewDashboard(_ctx: TemplateContext): string {
+  if (isCodexAstra(_ctx)) return `## Review readiness
+
+Read available review records with \`$GSTACK_BIN/gstack-review-read\` and combine
+them with the reviews actually completed in this session. Show review, target
+commit/scope, findings, verification limits and whether the project requires it.
+Check stored records against current HEAD; a recent date alone is not evidence
+that the current changes were reviewed. Reuse matching evidence rather than
+re-running unchanged checks just to create another log entry.
+
+Keep the required engineering review and unresolved release blockers. Apply the
+existing explicit skip_eng_review preference, if configured, with attribution.
+Report CLEARED only when required checks have evidence for this candidate; report
+missing, stale or failed required checks otherwise. Identify self-review versus
+independent review and the actual model when reported. Never infer a Claude/Codex
+pair of reviewers from a workflow name or fabricate cross-model agreement.
+Optional outside voices and missing optional history do not create new gates.`;
   return `## Review Readiness Dashboard
 
 After completing the review, read the review log and config to display the dashboard.
@@ -72,6 +89,12 @@ Display:
 }
 
 export function generatePlanFileReviewReport(_ctx: TemplateContext): string {
+  if (isCodexAstra(_ctx)) return `## Review report
+
+Summarize the reviews actually performed, findings, accepted changes, verification
+and unresolved material decisions. In plan mode incorporate this into the final
+<proposed_plan>; do not write a plan file or invoke a plan-exit tool. In execution
+mode update an explicitly requested plan artifact within the authorized scope.`;
   return `## Plan File Review Report
 
 After displaying the Review Readiness Dashboard in conversation output, also update the
@@ -170,6 +193,12 @@ there — the user then sees a plan whose review report is not at the bottom and
 }
 
 export function generateExitPlanModeGate(_ctx: TemplateContext): string {
+  if (isCodexAstra(_ctx)) return `## Final plan check
+
+Verify the plan includes the user's goal, concrete changes, interfaces, acceptance
+tests and settled material decisions. Required decisions still missing must be
+asked before finalization. Return one <proposed_plan> with the review outcome;
+do not require a plan file or local telemetry writes to complete the review.`;
   return `## EXIT PLAN MODE GATE (BLOCKING)
 
 Before calling ExitPlanMode, run this self-check. If any item fails, do the
@@ -202,10 +231,21 @@ must be the file's terminal heading.`;
 }
 
 export function generateAntiShortcutClause(_ctx: TemplateContext): string {
+  if (isCodexAstra(_ctx)) return `Evaluate the required review dimensions against evidence. A routine finding
+does not require a new approval when its correction is already authorized.
+Ask about material scope or design choices; do not finalize with unresolved decisions.`;
   return `**Anti-shortcut clause:** The plan file is the OUTPUT of the interactive review, not a substitute for it. Writing every finding into one plan write and calling ExitPlanMode without firing AskUserQuestion is the precise failure mode of the May 2026 transcript bug — the model explored, found issues, and dumped them into a deliverable rather than walking the user through them. If you have ANY non-trivial finding in any review section, the path from finding to ExitPlanMode goes THROUGH AskUserQuestion. Zero findings in every section is the only path to ExitPlanMode that bypasses AskUserQuestion. If you find yourself wanting to write a plan with findings before asking, stop and call AskUserQuestion now — that's the bug, recognize it.`;
 }
 
 export function generateSpecReviewLoop(_ctx: TemplateContext): string {
+  if (isCodexAstra(_ctx)) return `## Spec review
+
+Check the proposed document for contradictory requirements, missing acceptance
+criteria and unsupported repository claims. If the host permits delegation, an
+independent reviewer may check the same evidence; otherwise self-review and label
+that limitation. Correct defects within scope and verify them before presenting
+the document. Ask only about remaining material choices. Do not fabricate reviewer
+identity or require an unavailable agent tool to complete the review.`;
   return `## Spec Review Loop
 
 Before presenting the document to the user for approval, run an adversarial review.
@@ -271,6 +311,9 @@ Replace ITERATIONS, FOUND, FIXED, REMAINING, SCORE with actual values from the r
 
 export function generateBenefitsFrom(ctx: TemplateContext): string {
   if (!ctx.benefitsFrom || ctx.benefitsFrom.length === 0) return '';
+  if (isCodexAstra(ctx)) return `Use relevant existing design or review artifacts when present. Missing
+optional prerequisite skills do not block this review. Ask only if the goal or
+required design input cannot be established from the current task and repository.`;
 
   const skillList = ctx.benefitsFrom.map(s => `\`/${s}\``).join(' or ');
   const first = ctx.benefitsFrom[0];

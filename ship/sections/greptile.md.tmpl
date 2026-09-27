@@ -1,7 +1,14 @@
 ## Step 10: Address Greptile review comments (if PR exists)
 
+<!-- codex-astra -->
+Use a permitted native reviewer when available for this bounded read-only task;
+otherwise run the same checks sequentially. The instructions and result fields
+below apply in either case. Do not fabricate Claude Agent parameters or an
+independent review. Preserve all findings and subsequent release gates.
+<!-- otherwise -->
 **Dispatch the fetch + classification as a subagent** using the Agent tool with `subagent_type: "general-purpose"`. The subagent pulls every Greptile comment, runs the escalation detection algorithm, and classifies each comment. Parent receives a structured list and handles user interaction + file edits.
 
+<!-- /codex-astra -->
 **Subagent prompt:**
 
 > You are classifying Greptile review comments for a /ship workflow. Read `.claude/skills/review/greptile-triage.md` and follow the fetch, filter, classify, and **escalation detection** steps. Do NOT fix code, do NOT reply to comments, do NOT commit — report only.

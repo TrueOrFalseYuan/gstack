@@ -60,8 +60,14 @@ Swift source, traces from the buggy screen back to the view model, the data
 flow, and the state mutation. Identify the smallest change that fixes the
 behavior.
 
+<!-- codex-astra -->
+When several root causes are plausible, design a discriminating reproduction or
+instrumentation check and test them. Ask the user only for missing domain behavior,
+device access or a material scope choice; do not ask them to select a technical cause.
+<!-- otherwise -->
 Use AskUserQuestion if there are multiple plausible root causes — let the
 user pick the one to fix.
+<!-- /codex-astra -->
 
 ## Phase 3: Apply fix
 

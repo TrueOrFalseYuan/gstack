@@ -1,6 +1,12 @@
 ## Review Sections (8 passes, after Step 0 is complete)
 
+<!-- codex-astra -->
+Evaluate each review dimension against the actual target. Record evidence for
+findings and a short reason for inapplicable dimensions. Do not invent findings,
+inflate a small plan, or repeat completed analysis just to populate a checklist.
+<!-- otherwise -->
 **Anti-skip rule:** Never condense, abbreviate, or skip any review pass (1-8) regardless of plan type (strategy, spec, code, infra). Every pass in this skill exists for a reason. "This is a strategy doc so DX passes don't apply" is always wrong — DX gaps are where adoption breaks down. If a pass genuinely has zero findings, say "No issues found" and move on — but you must evaluate it.
+<!-- /codex-astra -->
 
 {{ANTI_SHORTCUT_CLAUSE}}
 
@@ -50,7 +56,14 @@ time chosen in 0C.
 Stripe test: Can a [persona from 0A] go from "never heard of this" to "it worked"
 in one terminal session without leaving the terminal?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY. Reference the persona.
+<!-- /codex-astra -->
 
 ### Pass 2: API/CLI/SDK Design (Usable + Useful)
 
@@ -74,7 +87,14 @@ Evaluate:
 
 Good API design test: Can a [persona] use this API correctly after seeing one example?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 3: Error Messages & Debugging (Fight Uncertainty)
 
@@ -99,7 +119,14 @@ Also evaluate:
 - **Debug mode**: Verbose output available?
 - **Stack traces**: Useful or internal framework noise?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 4: Documentation & Learning (Findable + Learn by Doing)
 
@@ -119,7 +146,14 @@ Evaluate:
 - **Versioning**: Docs match the version dev is using?
 - **Tutorials vs references**: Both exist?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 5: Upgrade & Migration Path (Credible)
 
@@ -134,7 +168,14 @@ Evaluate:
 - **Codemods**: Automated migration scripts?
 - **Versioning strategy**: Semantic versioning? Clear policy?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 6: Developer Environment & Tooling (Valuable + Accessible)
 
@@ -155,7 +196,14 @@ Evaluate:
 - **Local env reproducibility**: Works across OS, package managers, containers, proxies?
 - **Observability/testability**: Dry-run mode? Verbose output? Sample apps? Fixtures?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 7: Community & Ecosystem (Findable + Desirable)
 
@@ -171,7 +219,14 @@ Evaluate:
 - **Contributing guide**: Process clear?
 - **Pricing transparency**: No surprise bills?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 8: DX Measurement & Feedback Loops (Implement + Refine)
 
@@ -186,7 +241,14 @@ Evaluate:
 - **Friction audits**: Periodic reviews planned?
 - **Boomerang readiness**: Will /devex-review be able to measure reality vs. plan?
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Appendix: Claude Code Skill DX Checklist
 
@@ -199,7 +261,14 @@ Load reference: Read the "## Claude Code Skill DX Checklist" section from
 
 Check each item. For any unchecked item, explain what's missing and suggest the fix.
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion for any item that requires a design decision.
+<!-- /codex-astra -->
 
 {{CODEX_PLAN_REVIEW}}
 
@@ -207,6 +276,18 @@ When constructing the outside voice prompt, include the Developer Persona from S
 and the Competitive Benchmark from Step 0C. The outside voice should critique the plan
 in the context of who is using it and what they're competing against.
 
+<!-- codex-astra -->
+## Material decisions
+
+Use the common User decisions rules. Ground a question in a concrete finding and
+its consequence, with relevant file or design references. Offer viable choices and
+recommend one with its effort, risk and tradeoffs. Batch independent choices within
+the host's question schema; do not require a separate approval for every finding.
+Preserve settled scope, product direction and real unresolved decisions. Do not
+manufacture numerical completeness scores or ask the user to endorse clear facts.
+For visual preferences, use the comparison board when available; accept explicit
+text feedback and ask only when the choice remains ambiguous.
+<!-- otherwise -->
 ## CRITICAL RULE — How to ask questions
 
 Follow the AskUserQuestion format from the Preamble above. Additional rules for
@@ -228,6 +309,7 @@ DX reviews:
   lands in the plan.
 * Assume the user hasn't looked at this window in 20 minutes. Re-ground every question.
 
+<!-- /codex-astra -->
 ## Required Outputs
 
 ### Developer Persona Card
@@ -254,6 +336,14 @@ DX improvements considered and explicitly deferred, with one-line rationale each
 ### "What already exists" section
 Existing docs, examples, error handling, and DX patterns that the plan should reuse.
 
+<!-- codex-astra -->
+### Deferred work
+
+List actual DX debt with what, why, tradeoffs, dependencies and sufficient context
+to resume later. Batch unresolved priority or scope choices. In plan mode include
+this in the proposed plan; in execution mode write TODOS.md only within authorized
+scope. Do not turn every deferred item into a separate approval round.
+<!-- otherwise -->
 ### TODOS.md updates
 After all review passes are complete, present each potential TODO as its own individual
 AskUserQuestion. Never batch. For DX debt: missing error messages, unspecified upgrade
@@ -267,6 +357,7 @@ paths, documentation gaps, missing SDK languages. Each TODO gets:
 
 Options: **A)** Add to TODOS.md **B)** Skip **C)** Build it now
 
+<!-- /codex-astra -->
 ### DX Scorecard
 
 ```
@@ -334,6 +425,14 @@ DX IMPLEMENTATION CHECKLIST
 ### Unresolved Decisions
 If any AskUserQuestion goes unanswered, note here. Never silently default.
 
+<!-- codex-astra -->
+## Review record
+
+In plan mode, include review status and evidence in the final proposed plan. Do
+not write a plan file or persistent review log. In execution mode, record review
+results using the project's configured workflow when authorized; logging failure
+does not erase the review or require the user to rerun it.
+<!-- otherwise -->
 ## Review Log
 
 Persist after the DX Scorecard — the dashboard, the GSTACK REVIEW REPORT, and the EXIT
@@ -357,6 +456,7 @@ TIMESTAMP = current ISO 8601 datetime; STATUS = "clean" if score 8+ AND 0 unreso
 
 {{BRAIN_CACHE_REFRESH}}
 
+<!-- /codex-astra -->
 ## Next Steps — Review Chaining
 
 After displaying the Review Readiness Dashboard, recommend next reviews:

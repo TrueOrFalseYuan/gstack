@@ -268,11 +268,29 @@ Use auto-incrementing names to avoid collisions: check existing `{name}.regressi
 
 **4. Evaluate:**
 - Passes → commit: `git commit -m "test(qa): regression test for ISSUE-NNN — {desc}"`
+<!-- codex-astra -->
+- If a regression test fails, diagnose whether the fix or the test is wrong and
+  correct it within scope. Preserve useful failing evidence; do not delete a needed
+  test merely because it took more than two minutes. Report genuine blockers.
+<!-- otherwise -->
 - Fails → fix test once. Still failing → delete test, defer.
 - Taking >2 min exploration → skip and defer.
+<!-- /codex-astra -->
 
 **5. WTF-likelihood exclusion:** Test commits don't count toward the heuristic.
 
+<!-- codex-astra -->
+### 8f. Scope and progress check
+
+After a revert or a group of fixes, compare actual changes and evidence with the
+approved target. Continue verified repairs within scope. Pause for unrelated changes,
+new product decisions, unavailable verification or repeated regressions without
+progress. Describe the concrete issue; do not present invented risk percentages.
+Preserve the workflow limit of 50 fixes per invocation and report remaining work
+when that limit is reached. Do not treat a pending scope decision as permission.
+
+---
+<!-- otherwise -->
 ### 8f. Self-Regulation (STOP AND EVALUATE)
 
 Every 5 fixes (or after any revert), compute the WTF-likelihood:
@@ -293,6 +311,7 @@ WTF-LIKELIHOOD:
 
 ---
 
+<!-- /codex-astra -->
 ## Phase 9: Final QA
 
 After all fixes are applied:
@@ -351,4 +370,9 @@ If the repo has a `TODOS.md`:
 12. **One commit per fix.** Never bundle multiple fixes into one commit.
 13. **Only modify tests when generating regression tests in Phase 8e.5.** Never modify CI configuration. Never modify existing tests — only create new test files.
 14. **Revert on regression.** If a fix makes things worse, `git revert HEAD` immediately.
+<!-- codex-astra -->
+15. Reassess scope and progress using evidence. Ask only when a concrete decision
+or blocker prevents completing the authorized QA work.
+<!-- otherwise -->
 15. **Self-regulate.** Follow the WTF-likelihood heuristic. When in doubt, stop and ask.
+<!-- /codex-astra -->

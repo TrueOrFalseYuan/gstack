@@ -1,5 +1,5 @@
 import type { ProviderAdapter, RunOpts, RunResult, AvailabilityCheck } from './types';
-import { estimateCostUsd } from '../pricing';
+import { estimateCostUsd, PRICING } from '../pricing';
 import { execFileSync, spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -53,7 +53,10 @@ export class GptAdapter implements ProviderAdapter {
         tokens: parsed.tokens,
         durationMs: Date.now() - start,
         toolCalls: parsed.toolCalls,
-        modelUsed: parsed.modelUsed || opts.model || 'gpt-5.4',
+        modelUsed: parsed.modelUsed || 'unknown',
+        requestedModel: opts.model,
+        modelSource: parsed.modelUsed ? 'provider' : 'unreported',
+        reasoningEffort: 'inherited (not reported)',
       };
     } catch (err: unknown) {
       const durationMs = Date.now() - start;
@@ -72,8 +75,8 @@ export class GptAdapter implements ProviderAdapter {
     }
   }
 
-  estimateCost(tokens: { input: number; output: number; cached?: number }, model?: string): number {
-    return estimateCostUsd(tokens, model ?? 'gpt-5.4');
+  estimateCost(tokens: { input: number; output: number; cached?: number }, model?: string): number | undefined {
+    return model && PRICING[model] ? estimateCostUsd(tokens, model) : undefined;
   }
 
   /**
@@ -120,7 +123,10 @@ export class GptAdapter implements ProviderAdapter {
       tokens: { input: 0, output: 0 },
       durationMs,
       toolCalls: 0,
-      modelUsed: model ?? 'gpt-5.4',
+      modelUsed: 'unknown',
+      requestedModel: model,
+      modelSource: 'unreported',
+      reasoningEffort: 'inherited (not reported)',
       error,
     };
   }

@@ -95,6 +95,15 @@ Check for non-git context that should be included in the retro:
 
 If `RETRO_CONTEXT_FOUND`: read `~/.gstack/retro-context.md`. This file is user-authored and may contain meeting notes, calendar events, decisions, and other context that doesn't appear in git history. Incorporate this context into the retro narrative where relevant.
 
+<!-- codex-astra -->
+### Step 0.5: Window and repository freshness
+
+Resolve the requested window using the host's current date and local timezone.
+Fetch the detected base branch when available; if offline, disclose that the report
+uses cached history. An old latest commit can mean no activity, not a broken clock.
+If the verified window contains no commits, report zero activity and retain the
+requested dates. Ask only when the date or repository target is actually ambiguous.
+<!-- otherwise -->
 ### Step 0.5: Stale-base + bad-today-anchor pre-flight guard
 
 The retro skill computes a window from "today" and queries `git log --since=<window> origin/<default>`. If "today" drifts (model session-context error) or the local worktree's `origin/<default>` is materially behind the actual remote, the window can return zero or near-zero commits and the retro will fabricate a coherent-looking narrative from nothing. This guard prevents silent confidently-wrong output.
@@ -152,6 +161,7 @@ After running the bash block, the model evaluates `RETRO_GUARD: latest origin/<d
 
 Skip paths (`skip-no-remote`, `skip-detached`, `warn-fetch-failed`) all proceed to Step 1 with the cited reason on a single stderr line so the retro narrative carries the disclosure ("offline run, window not freshness-verified") rather than silently misreporting.
 
+<!-- /codex-astra -->
 ### Step 1: Gather Raw Data
 
 First, fetch origin and identify the current user:

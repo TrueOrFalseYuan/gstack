@@ -66,9 +66,15 @@ You are a senior product designer with strong opinions about typography, color, 
 ls DESIGN.md design-system.md 2>/dev/null || echo "NO_DESIGN_FILE"
 ```
 
+<!-- codex-astra -->
+- If DESIGN.md exists, read it and apply the user's requested update. Ask update
+  versus replace only if the intended direction is genuinely unclear.
+- If no design file exists, continue.
+<!-- otherwise -->
 - If a DESIGN.md exists: Read it. Ask the user: "You already have a design system. Want to **update** it, **start fresh**, or **cancel**?"
 - If no DESIGN.md: continue.
 
+<!-- /codex-astra -->
 **Gather product context from the codebase:**
 
 ```bash
@@ -116,6 +122,14 @@ If `DESIGN_NOT_AVAILABLE`: Phase 5 falls back to the HTML preview page (still go
 
 ## Phase 1: Product Context
 
+<!-- codex-astra -->
+Use product, audience, project type and design preferences already established in
+the request or prior design artifacts. Ask only for missing facts that change the
+design direction. Offer research when it would materially help; preserve an existing
+research preference. Establish the one memorable product impression if unknown,
+then use it to guide the proposal. Do not require another confirmation of the same
+product context before producing a concrete design for review.
+<!-- otherwise -->
 Ask the user a single question that covers everything you need to know. Pre-fill what you can infer from the codebase.
 
 **AskUserQuestion Q1 — include ALL of these:**
@@ -135,6 +149,7 @@ a posture ("for builders, not managers"). Write it down. Every subsequent design
 decision should serve this memorable thing. Design that tries to be memorable for
 everything is memorable for nothing.
 
+<!-- /codex-astra -->
 ### Taste profile (if this user has prior sessions)
 
 {{TASTE_PROFILE}}

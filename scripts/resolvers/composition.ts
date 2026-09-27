@@ -1,4 +1,6 @@
 import type { TemplateContext } from './types';
+import { isCodexAstra } from './astra';
+import { externalSkillName } from './codex-helpers';
 
 /**
  * {{INVOKE_SKILL:skill-name}} — emits prose instructing Claude to read
@@ -11,6 +13,9 @@ export function generateInvokeSkill(ctx: TemplateContext, args?: string[]): stri
   const skillName = args?.[0];
   if (!skillName || skillName === '') {
     throw new Error('{{INVOKE_SKILL}} requires a skill name, e.g. {{INVOKE_SKILL:plan-ceo-review}}');
+  }
+  if (isCodexAstra(ctx)) {
+    return `Load the /${skillName} skill through the host's skill mechanism, or read ../${externalSkillName(skillName)}/SKILL.md relative to the current skill directory. Reuse the parent's scope, settled decisions and runtime context. Read applicable sections when reached. If unavailable, identify the missing reference and continue independent work; do not claim that review completed.`;
   }
 
   // Parse optional skip= parameter from args[1+]

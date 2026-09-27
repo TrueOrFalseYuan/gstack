@@ -1,6 +1,19 @@
+import type { TemplateContext } from '../types';
+import { isCodexAstra } from '../astra';
 
+export function generateTestFailureTriage(ctx?: TemplateContext): string {
+  if (ctx && isCodexAstra(ctx)) return `## Test Failure Ownership Triage
 
-export function generateTestFailureTriage(): string {
+Trace failures against the branch diff and relevant dependencies. Reproduce on
+the base revision in isolation when ownership is unclear. Do not label a failure
+pre-existing merely because its test file was unchanged.
+
+Fix failures introduced by the authorized changes, then rerun affected checks.
+Continue the ship workflow when required checks pass. Stop before publishing if
+failures remain or the fix needs a material scope decision; report the evidence.
+For confirmed pre-existing failures, report them separately and apply the repo's
+existing release policy. Ask only when a required waiver or out-of-scope repair
+has not been authorized. Do not silently waive checks or assign issues to others.`;
   return `## Test Failure Ownership Triage
 
 When tests fail, do NOT immediately stop. First, determine ownership:
@@ -105,4 +118,3 @@ Use AskUserQuestion:
 - Continue with the workflow.
 - Note in output: "Pre-existing test failure skipped: <test-name>"`;
 }
-

@@ -10,6 +10,13 @@
 `db:test:prepare` internally, which loads the schema into the correct lane database.
 Running bare test migrations without INSTANCE hits an orphan DB and corrupts structure.sql.
 
+<!-- codex-astra -->
+Detect the repository's required test commands from its instructions, manifests
+and CI. Run applicable free suites, in parallel only when their fixtures and resources
+are independent. Capture each command's exit status and output; a successful `tee`
+or `wait` alone is not proof the test command passed. Use Rails test lanes only in
+projects that actually provide them. Do not assume `npm run test` exists.
+<!-- otherwise -->
 Run both test suites in parallel:
 
 ```bash
@@ -20,6 +27,7 @@ wait
 
 After both complete, read the output files and check pass/fail.
 
+<!-- /codex-astra -->
 **If any test fails:** Do NOT immediately stop. Apply the Test Failure Ownership Triage:
 
 {{TEST_FAILURE_TRIAGE}}
@@ -40,6 +48,17 @@ Evals are mandatory when prompt-related files change. Skip this step entirely if
 git diff origin/<base> --name-only
 ```
 
+<!-- codex-astra -->
+Use this repository's declared prompt-file patterns, eval routing and baseline
+contracts to select affected suites. Do not assume Rails eval runners in other stacks.
+For gstack template/resolver changes, use its generation tests and affected skill
+evals. Run paid evals only when their cost and provider use are authorized. A missing
+required eval is a verification gap, not a pass. Preserve required release gates.
+
+Use the repo's documented runner and record exit status, model, configuration and
+results. If a changed prompt fails its eval, fix it and rerun the affected case.
+Report an actual scope or environment blocker when a required check cannot pass.
+<!-- otherwise -->
 Match against these patterns (from CLAUDE.md):
 - `app/services/*_prompt_builder.rb`
 - `app/services/*_generation_service.rb`, `*_writer_service.rb`, `*_designer_service.rb`
@@ -92,6 +111,7 @@ Then poll the printed log path; break on the `EXIT=` sentinel (covers both pass
 and crash — silence is never success). The detached run survives even if your
 poller is reaped.
 
+<!-- /codex-astra -->
 **4. Check results:**
 
 - **If any eval fails:** Show the failures, the cost dashboard, and **STOP**. Do not proceed.

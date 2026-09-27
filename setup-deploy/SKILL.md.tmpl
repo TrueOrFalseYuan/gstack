@@ -44,6 +44,12 @@ When the user types `/setup-deploy`, run this skill.
 grep -A 20 "## Deploy Configuration" CLAUDE.md 2>/dev/null || echo "NO_CONFIG"
 ```
 
+<!-- codex-astra -->
+If configuration already exists, inspect it and reuse fields that remain valid.
+Apply the user's requested field changes. Ask only about missing or conflicting
+deployment targets, credentials or consequential choices. Do not overwrite the whole
+configuration merely to satisfy a setup sequence.
+<!-- otherwise -->
 If configuration already exists, show it and ask:
 
 - **Context:** Deploy configuration already exists in CLAUDE.md.
@@ -54,6 +60,7 @@ If configuration already exists, show it and ask:
 
 If the user picks C, stop.
 
+<!-- /codex-astra -->
 ### Step 2: Detect platform
 
 Run the platform detection from the deploy bootstrap:

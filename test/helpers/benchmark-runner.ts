@@ -11,6 +11,7 @@ import type { ProviderAdapter, RunOpts, RunResult } from './providers/types';
 import { ClaudeAdapter } from './providers/claude';
 import { GptAdapter } from './providers/gpt';
 import { GeminiAdapter } from './providers/gemini';
+import { PRICING } from './pricing';
 
 export interface BenchmarkInput {
   prompt: string;
@@ -83,7 +84,8 @@ export async function runBenchmark(input: BenchmarkInput): Promise<BenchmarkRepo
       };
       const res = await adapter.run(opts);
       entry.result = res;
-      entry.costUsd = adapter.estimateCost(res.tokens, res.modelUsed);
+      // Unknown model/pricing must not masquerade as a free run in comparisons.
+      entry.costUsd = PRICING[res.modelUsed] ? adapter.estimateCost(res.tokens, res.modelUsed) : undefined;
     })());
   }
 
@@ -109,11 +111,11 @@ export function formatTable(report: BenchmarkReport): string {
     }
     const r = e.result!;
     if (r.error) {
-      rows.push(`${pad(r.modelUsed, 20)} ${pad(msToStr(r.durationMs), 9)} ${pad(`${r.tokens.input}→${r.tokens.output}`, 20)} ${pad(fmtCost(e.costUsd), 10)} ${pad('-', 9)} ${pad(String(r.toolCalls), 12)} ERROR ${r.error.code}: ${r.error.reason.slice(0, 40)}`);
+      rows.push(`${pad(r.modelUsed, 20)} ${pad(msToStr(r.durationMs), 9)} ${pad(`${r.tokens.input}→${r.tokens.output}`, 20)} ${pad(fmtCost(e.costUsd), 10)} ${pad('-', 9)} ${pad(String(r.toolCalls), 12)} ERROR ${r.error.code}: ${r.error.reason.slice(0, 40)}${modelNotes(r)}`);
       continue;
     }
     const quality = e.qualityScore !== undefined ? `${e.qualityScore.toFixed(1)}/10` : '-';
-    rows.push(`${pad(r.modelUsed, 20)} ${pad(msToStr(r.durationMs), 9)} ${pad(`${r.tokens.input}→${r.tokens.output}`, 20)} ${pad(fmtCost(e.costUsd), 10)} ${pad(quality, 9)} ${pad(String(r.toolCalls), 12)}`);
+    rows.push(`${pad(r.modelUsed, 20)} ${pad(msToStr(r.durationMs), 9)} ${pad(`${r.tokens.input}→${r.tokens.output}`, 20)} ${pad(fmtCost(e.costUsd), 10)} ${pad(quality, 9)} ${pad(String(r.toolCalls), 12)}${modelNotes(r)}`);
   }
   return rows.join('\n');
 }
@@ -140,11 +142,11 @@ export function formatMarkdown(report: BenchmarkReport): string {
     }
     const r = e.result!;
     if (r.error) {
-      lines.push(`| ${r.modelUsed} | ${msToStr(r.durationMs)} | ${r.tokens.input}→${r.tokens.output} | ${fmtCost(e.costUsd)} | - | ${r.toolCalls} | ERROR ${r.error.code}: ${r.error.reason.slice(0, 80)} |`);
+      lines.push(`| ${r.modelUsed} | ${msToStr(r.durationMs)} | ${r.tokens.input}→${r.tokens.output} | ${fmtCost(e.costUsd)} | - | ${r.toolCalls} | ERROR ${r.error.code}: ${r.error.reason.slice(0, 80)}${modelNotes(r)} |`);
       continue;
     }
     const quality = e.qualityScore !== undefined ? `${e.qualityScore.toFixed(1)}/10` : '-';
-    lines.push(`| ${r.modelUsed} | ${msToStr(r.durationMs)} | ${r.tokens.input}→${r.tokens.output} | ${fmtCost(e.costUsd)} | ${quality} | ${r.toolCalls} | |`);
+    lines.push(`| ${r.modelUsed} | ${msToStr(r.durationMs)} | ${r.tokens.input}→${r.tokens.output} | ${fmtCost(e.costUsd)} | ${quality} | ${r.toolCalls} |${modelNotes(r)} |`);
   }
   return lines.join('\n');
 }
@@ -159,7 +161,15 @@ function msToStr(ms: number): string {
 }
 
 function fmtCost(usd?: number): string {
-  if (usd === undefined) return '-';
+  if (usd === undefined) return 'unknown';
   if (usd < 0.01) return `$${usd.toFixed(4)}`;
   return `$${usd.toFixed(2)}`;
+}
+
+function modelNotes(result: RunResult): string {
+  return [
+    result.requestedModel ? `requested: ${result.requestedModel}` : '',
+    result.modelSource === 'unreported' ? 'actual model unreported' : '',
+    result.reasoningEffort ? `reasoning: ${result.reasoningEffort}` : '',
+  ].filter(Boolean).map(note => ` ${note};`).join('');
 }

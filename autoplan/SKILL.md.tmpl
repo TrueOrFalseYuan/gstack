@@ -36,6 +36,63 @@ allowed-tools:
 
 {{BENEFITS_FROM}}
 
+<!-- codex-astra -->
+# /autoplan — Codex review pipeline
+
+Deliver one decision-complete plan after CEO, applicable design, engineering and
+DX review, in that order. Reuse the user's target and settled premises. Ask only
+for a missing premise that changes the problem being solved.
+
+## Load and review
+
+Load the generated sibling skills through the host, or read their SKILL.md files:
+`../gstack-plan-ceo-review/`, `../gstack-plan-design-review/`,
+`../gstack-plan-eng-review/`, and `../gstack-plan-devex-review/`.
+Their section paths are relative to each owning skill directory. Load applicable
+sections once. Do not duplicate bootstrap, onboarding, finalization or question
+steps already handled by this parent workflow. If a required review cannot be
+loaded, report that gap rather than marking it complete.
+
+1. CEO: evaluate premises, alternatives, existing capabilities, scope and failure
+   modes. Produce accepted/deferred scope and the error/rescue and failure-mode
+   registries where applicable. Preserve the user's direction by default.
+2. Design: when UI is involved, review hierarchy, interaction states, accessibility,
+   responsiveness, design-system fit and implementation specificity. Produce the
+   scorecard and concrete changes; identify missing visual evidence. For a non-UI
+   plan, record why design review does not apply.
+3. Engineering: review architecture, code quality, tests and performance. Produce
+   data flow, the test diagram, interfaces, failure handling and acceptance tests.
+4. DX: assess the developer persona, getting started, API/CLI ergonomics, errors,
+   documentation, upgrades, environment and observability. Distinguish measured
+   time-to-hello-world from estimates. Produce a journey map and applicable scores.
+
+Each phase consumes the previous phase's decisions. Run phases sequentially.
+Report a brief phase transition with findings and any change to the plan.
+
+## Decisions and independent review
+
+Auto-resolve routine, reversible details within the user's scope using existing
+patterns, minimal sufficient design and complete acceptance criteria. Keep a concise
+decision record. Scope changes, close tradeoffs and proposals to reverse the user's
+direction remain user decisions. Present concrete choices together at the final
+decision step unless an earlier answer is necessary for the next phase.
+
+Use independent review when the requested workflow and host permit it. Delegate
+bounded checks with the relevant raw artifacts, not the expected conclusion. If a
+distinct model is requested and available, use its documented skill (for example
+/claude); do not recursively run /autoplan or claim same-model work is cross-model
+agreement. Without an independent reviewer, self-review and report the limitation.
+An optional unavailable voice does not block otherwise complete planning.
+
+## Completion
+
+Verify all applicable review dimensions were covered with evidence or a reason
+they do not apply. Correct contradictions and missing acceptance criteria. Resolve
+material user decisions before finalizing. Include the goal, accepted scope,
+interfaces, implementation sequence, tests, constraints and review outcomes in a
+single <proposed_plan> in plan mode. Do not write a plan artifact or start execution
+in plan mode. In execution mode, save a plan only if requested, then report its path.
+<!-- otherwise -->
 # /autoplan — Auto-Review Pipeline
 
 One command. Rough plan in, fully reviewed plan out.
@@ -914,3 +971,4 @@ Suggest next step: `/ship` when ready to create the PR.
 - **Full depth means full depth.** Do not compress or skip sections from the loaded skill files (except the skip list in Phase 0). "Full depth" means: read the code the section asks you to read, produce the outputs the section requires, identify every issue, and decide each one. A one-sentence summary of a section is not "full depth" — it is a skip. If you catch yourself writing fewer than 3 sentences for any review section, you are likely compressing.
 - **Artifacts are deliverables.** Test plan artifact, failure modes registry, error/rescue table, ASCII diagrams — these must exist on disk or in the plan file when the review completes. If they don't exist, the review is incomplete.
 - **Sequential order.** CEO → Design → Eng → DX. Each phase builds on the last.
+<!-- /codex-astra -->

@@ -37,6 +37,14 @@ triggers:
 
 Review this plan thoroughly before making any code changes. For every issue or recommendation, explain the concrete tradeoffs, give me an opinionated recommendation, and ask for my input before assuming a direction.
 
+<!-- codex-astra -->
+## Review target
+
+Use the plan, files, branch or request already identified by the user. Inspect
+available context before asking. If several plausible targets remain and choosing
+one changes the review, ask one concise target question, then wait for that answer.
+Do not re-confirm an explicit target or a target settled earlier in the conversation.
+<!-- otherwise -->
 ## Scope gate (FIRST — overrides everything below). This is a hard STOP.
 
 Before ANYTHING else in this skill — before the Design Doc Check, the office-hours prerequisite offer, Step 0, and any `git` / `Read` / `Grep` / `Glob` / `Bash` call — unless an exception below applies, your VERY FIRST tool call MUST be AskUserQuestion, to confirm the review target. Do not run the Design Doc Check bash or explore the repo before the user answers.
@@ -60,6 +68,7 @@ C) A specific file, directory, or path.
 
 Recommendation: A when a branch diff exists, otherwise B. Reply with A, B, or C. STOP and wait for the answer — only after the user picks do you run the Design Doc Check and Step 0 against that target.
 
+<!-- /codex-astra -->
 ## Priority hierarchy
 If the user asks you to compress or the system triggers context compaction: Step 0 > Test diagram > Opinionated recommendations > Everything else. Never skip Step 0 or the test diagram. Do not preemptively warn about context limits -- the system handles compaction automatically.
 
@@ -122,7 +131,11 @@ If a design doc exists, read it. Use it as the source of truth for the problem s
 
 ### Step 0: Scope Challenge
 
+<!-- codex-astra -->
+> Review the target established above; reuse the user's explicit selection.
+<!-- otherwise -->
 > Reminder: the **Scope gate** at the top of this skill applies first. Do not run Step 0 until the gate has resolved a target — the user answered, the user named one, or plan mode auto-selected B — and run it against that target.
+<!-- /codex-astra -->
 
 Before reviewing anything, answer these questions:
 1. **What existing code already partially or fully solves each sub-problem?** Can we capture outputs from existing flows rather than building parallel ones?
@@ -146,9 +159,22 @@ Before reviewing anything, answer these questions:
    - How will users download or install it (GitHub Releases, package manager, container registry)?
    If the plan defers distribution, flag it explicitly in the "NOT in scope" section — don't let it silently drop.
 
+<!-- codex-astra -->
+If the complexity check triggers, trace why that breadth is necessary and present
+a smaller viable alternative. Ask only if the alternative changes a material design
+or accepted scope; file counts alone do not require a new approval.
+<!-- otherwise -->
 If the complexity check triggers (8+ files or 2+ new classes/services), STOP before any review-section work. Call AskUserQuestion: name what's overbuilt, propose a minimal version that achieves the core goal, ask whether to reduce or proceed as-is. The AskUserQuestion call is a tool_use, not prose — call the tool directly.
+<!-- /codex-astra -->
 
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** Do NOT proceed to Section 1 (Architecture review), edit the plan file with a proposed scope reduction, or call ExitPlanMode until the user responds. Naming the 80% solution in chat prose and continuing — or loading the AskUserQuestion schema via ToolSearch and then never invoking it — is the failure mode this gate exists to prevent.
+<!-- /codex-astra -->
 
 If the complexity check does not trigger, present your Step 0 findings and proceed directly to Section 1.
 

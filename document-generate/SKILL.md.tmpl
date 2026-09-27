@@ -61,6 +61,12 @@ any documentation. This prevents the "documentation that describes half the feat
    - **If invoked for an entire project**: scope is the full project
    - **If called from /document-release with gaps**: scope is the specific entities from the coverage map
 
+<!-- codex-astra -->
+2. Reuse the user's documentation target and the repository's existing layout.
+   For a specific module, update its established docs. Ask about inline versus
+   standalone output only when the request and conventions leave a consequential
+   choice unresolved. Do not automatically expand every request to both.
+<!-- otherwise -->
 2. Use AskUserQuestion to confirm scope and ask about documentation target:
 
    - A) Write documentation inline in existing files (README, ARCHITECTURE, etc.)
@@ -69,6 +75,7 @@ any documentation. This prevents the "documentation that describes half the feat
 
    RECOMMENDATION: Choose C because it maximizes both discoverability and depth.
 
+<!-- /codex-astra -->
 3. Determine the output format:
    - If the project already has a `docs/` directory, follow its conventions
    - If the project uses a doc framework (Nextra, Docusaurus, MkDocs, VitePress), follow its format

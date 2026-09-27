@@ -67,7 +67,12 @@ Only *actions* are idempotent:
 - Step 12: If VERSION already bumped, skip the bump but still read the version
 - Step 17: If already pushed, skip the push command
 - Step 19: If PR exists, update the body instead of creating a new PR
+<!-- codex-astra -->
+Verify the final candidate with all required checks. Reuse successful results
+only for the same code and relevant environment; rerun after material changes.
+<!-- otherwise -->
 Never skip a verification step because a prior `/ship` run already performed it.
+<!-- /codex-astra -->
 
 ---
 

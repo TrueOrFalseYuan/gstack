@@ -1,7 +1,14 @@
 ## Step 7: Test Coverage Audit
 
+<!-- codex-astra -->
+Use a permitted native reviewer when available for this bounded read-only task;
+otherwise run the same checks sequentially. The instructions and result fields
+below apply in either case. Do not fabricate Claude Agent parameters or an
+independent review. Preserve all findings and subsequent release gates.
+<!-- otherwise -->
 **Dispatch this step as a subagent** using the Agent tool with `subagent_type: "general-purpose"`. The subagent runs the coverage audit in a fresh context window — the parent only sees the conclusion, not intermediate file reads. This is context-rot defense.
 
+<!-- /codex-astra -->
 **Subagent prompt:** Pass the following instructions to the subagent, with `<base>` substituted with the base branch:
 
 > You are running a ship-workflow test coverage audit. Run `git diff <base>...HEAD` as needed. Do not commit or push — report only.

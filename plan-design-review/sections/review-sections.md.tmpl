@@ -1,6 +1,12 @@
 ## Review Sections (7 passes, after scope is agreed)
 
+<!-- codex-astra -->
+Evaluate each review dimension against the actual target. Record evidence for
+findings and a short reason for inapplicable dimensions. Do not invent findings,
+inflate a small plan, or repeat completed analysis just to populate a checklist.
+<!-- otherwise -->
 **Anti-skip rule:** Never condense, abbreviate, or skip any review pass (1-7) regardless of plan type (strategy, spec, code, infra). Every pass in this skill exists for a reason. "This is a strategy doc so design passes don't apply" is always wrong — design gaps are where implementation breaks down. If a pass genuinely has zero findings, say "No issues found" and move on — but you must evaluate it.
+<!-- /codex-astra -->
 
 {{ANTI_SHORTCUT_CLAUSE}}
 
@@ -9,7 +15,14 @@
 ### Pass 1: Information Architecture
 Rate 0-10: Does the plan define what the user sees first, second, third?
 FIX TO 10: Add information hierarchy to the plan. Include ASCII diagram of screen/page structure and navigation flow. Apply "constraint worship" — if you can only show 3 things, which 3?
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues, say so and move on. Do NOT proceed until user responds.
+<!-- /codex-astra -->
 
 ### Pass 2: Interaction State Coverage
 Rate 0-10: Does the plan specify loading, empty, error, success, partial states?
@@ -21,7 +34,14 @@ FIX TO 10: Add interaction state table to the plan:
 ```
 For each state: describe what the user SEES, not backend behavior.
 Empty states are features — specify warmth, primary action, context.
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 3: User Journey & Emotional Arc
 Rate 0-10: Does the plan consider the user's emotional experience?
@@ -33,7 +53,14 @@ FIX TO 10: Add user journey storyboard:
   ...
 ```
 Apply time-horizon design: 5-sec visceral, 5-min behavioral, 5-year reflective.
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 4: AI Slop Risk
 Rate 0-10: Does the plan describe specific, intentional UI — or generic patterns?
@@ -45,18 +72,39 @@ FIX TO 10: Rewrite vague UI descriptions with specific alternatives.
 - "Clean, modern UI" → meaningless. Replace with actual design decisions.
 - "Dashboard with widgets" → what makes this NOT every other dashboard?
 If visual mockups were generated in Step 0.5, evaluate them against the AI slop blacklist above. Read each mockup image using the Read tool. Does the mockup fall into generic patterns (3-column grid, centered hero, stock-photo feel)? If so, flag it and offer to regenerate with more specific direction via `$D iterate --feedback "..."`.
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 5: Design System Alignment
 Rate 0-10: Does the plan align with DESIGN.md?
 FIX TO 10: If DESIGN.md exists, annotate with specific tokens/components. If no DESIGN.md, flag the gap and recommend `/design-consultation`.
 Flag any new component — does it fit the existing vocabulary?
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 6: Responsive & Accessibility
 Rate 0-10: Does the plan specify mobile/tablet, keyboard nav, screen readers?
 FIX TO 10: Add responsive specs per viewport — not "stacked on mobile" but intentional layout changes. Add a11y: keyboard nav patterns, ARIA landmarks, touch target sizes (44px min), color contrast requirements.
+<!-- codex-astra -->
+Evaluate and report findings with evidence. Apply routine corrections to the
+proposed plan within settled scope. Ask about unresolved material choices or scope
+changes, batching independent decisions. Wait for required answers before dependent
+work; findings with no decision needed do not require a confirmation round.
+<!-- otherwise -->
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY.
+<!-- /codex-astra -->
 
 ### Pass 7: Unresolved Design Decisions
 Surface ambiguities that will haunt implementation:
@@ -78,6 +126,18 @@ AskUserQuestion: "The review passes changed [list major design changes]. Want me
 
 If yes, use `$D iterate` with feedback summarizing the changes, or `$D variants` with an updated brief. Save to the same `$_DESIGN_DIR` directory.
 
+<!-- codex-astra -->
+## Material decisions
+
+Use the common User decisions rules. Ground a question in a concrete finding and
+its consequence, with relevant file or design references. Offer viable choices and
+recommend one with its effort, risk and tradeoffs. Batch independent choices within
+the host's question schema; do not require a separate approval for every finding.
+Preserve settled scope, product direction and real unresolved decisions. Do not
+manufacture numerical completeness scores or ask the user to endorse clear facts.
+For visual preferences, use the comparison board when available; accept explicit
+text feedback and ask only when the choice remains ambiguous.
+<!-- otherwise -->
 ## CRITICAL RULE — How to ask questions
 Follow the AskUserQuestion format from the Preamble above. Additional rules for plan design reviews:
 * **One issue = one AskUserQuestion call.** Never combine multiple issues into one question.
@@ -88,6 +148,7 @@ Follow the AskUserQuestion format from the Preamble above. Additional rules for 
 * **Zero findings:** if a section has zero findings, state "No issues, moving on" and proceed. Otherwise, use AskUserQuestion for each gap — a gap with an "obvious fix" is still a gap and still needs user approval before any change lands in the plan.
 * **NEVER use AskUserQuestion to ask which variant the user prefers.** Always create a comparison board first (`$D compare --serve`) and open it in the browser. The board has rating controls, comments, remix/regenerate buttons, and structured feedback output. Use AskUserQuestion ONLY to notify the user the board is open and wait for them to finish — not to present variants inline and ask "which do you prefer?" That is a degraded experience.
 
+<!-- /codex-astra -->
 ## Required Outputs
 
 ### "NOT in scope" section
@@ -97,7 +158,12 @@ Design decisions considered and explicitly deferred, with one-line rationale eac
 Existing DESIGN.md, UI patterns, and components that the plan should reuse.
 
 ### TODOS.md updates
+<!-- codex-astra -->
+Collect deferred work with rationale. Ask about TODOs only when they change
+accepted scope or require a material priority decision; batch independent choices.
+<!-- otherwise -->
 After all review passes are complete, present each potential TODO as its own individual AskUserQuestion. Never batch TODOs — one per question. Never silently skip this step.
+<!-- /codex-astra -->
 
 For design debt: missing a11y, unresolved responsive behavior, deferred empty states. Each TODO gets:
 * **What:** One-line description of the work.
@@ -156,6 +222,14 @@ If visual mockups were generated during this review, add to the plan file:
 
 Include the full path to each approved mockup (the variant the user chose), a one-line description of the direction, and any constraints. The implementer reads this to know exactly which visual to build from. These persist across conversations and workspaces. If no mockups were generated, omit this section.
 
+<!-- codex-astra -->
+## Review record
+
+In plan mode, include review status and evidence in the final proposed plan. Do
+not write a plan file or persistent review log. In execution mode, record review
+results using the project's configured workflow when authorized; logging failure
+does not erase the review or require the user to rerun it.
+<!-- otherwise -->
 ## Review Log
 
 After producing the Completion Summary above, persist the review result.
@@ -191,6 +265,7 @@ Substitute values from the Completion Summary:
 
 {{BRAIN_CACHE_REFRESH}}
 
+<!-- /codex-astra -->
 ## Next Steps — Review Chaining
 
 After displaying the Review Readiness Dashboard, recommend the next review(s) based on what this design review discovered. Read the dashboard output to see which reviews have already been run and whether they are stale.

@@ -125,6 +125,12 @@ Or target a specific agent with `./setup --host <name>`:
 **Want to add support for another agent?** See [docs/ADDING_A_HOST.md](docs/ADDING_A_HOST.md).
 It's one TypeScript config file, zero code changes.
 
+**GPT-6 Astra on Codex:** opt into its instruction profile with
+`bun run gen:skill-docs --host codex --model gpt-6-astra`.
+The default remains GPT-5.6 Sol; generation does not change your running model or
+reasoning effort. See the [Astra profile and skill audit](docs/codex-astra.md)
+for isolated generation, verification and benchmark instructions.
+
 ## See it work
 
 ```

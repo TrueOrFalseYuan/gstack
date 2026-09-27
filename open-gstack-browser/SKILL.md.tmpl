@@ -29,6 +29,16 @@ anti-bot stealth, and custom branding. You see every action in real time.
 
 {{BROWSE_SETUP}}
 
+<!-- codex-astra -->
+## Step 0: Inspect the current session
+
+Run `$B status`. Reuse a healthy headed connection and continue to verification.
+If it is stale, use the browse CLI's documented stop/disconnect operation first.
+Do not kill a PID solely because a state file names it: verify process identity and
+ownership before terminating a leftover process. Remove Chromium singleton locks
+only after confirming no live process owns that profile. Preserve a live user
+session; request a choice if connecting would replace it. Then connect and verify.
+<!-- otherwise -->
 ## Step 0: Pre-flight cleanup
 
 Before connecting, kill any stale browse servers and clean up lock files that
@@ -52,6 +62,7 @@ done
 echo "Pre-flight cleanup done"
 ```
 
+<!-- /codex-astra -->
 ## Step 1: Connect
 
 ```bash

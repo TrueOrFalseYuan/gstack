@@ -449,6 +449,20 @@ Tie everything to user goals and product objectives. Always suggest specific imp
 }
 
 export function generateDesignSketch(_ctx: TemplateContext): string {
+  if (_ctx.host === 'codex' && _ctx.model === 'gpt-6-astra') return `## Visual sketch (UI scope)
+
+Reuse DESIGN.md and the chosen product direction. For UI scope, sketch the core
+1-3 screens with realistic content, hierarchy, interaction states and edge cases.
+In plan mode describe the wireframe in the response without files or browser writes.
+In execution mode create a self-contained HTML sketch with inline CSS and no remote
+dependencies; render and capture it with the available browser tool. If rendering
+is unavailable, disclose the missing visual verification. Iterate on actual user
+feedback; do not require approval for an already-settled layout.
+
+Include the sketch reference in the requested design artifact. An outside design
+opinion is optional and must use an available, authorized reviewer. Preserve model
+and effort settings and attribute the actual reviewer; a self-review is not a
+distinct model's opinion.`;
   return `## Visual Sketch (UI ideas only)
 
 If the chosen approach involves user-facing UI (screens, pages, forms, dashboards,
@@ -1154,4 +1168,3 @@ Flat design can strip away useful visual information that signals interactivity.
 Prioritize ruthlessly: things needed in a hurry go close at hand, everything
 else a few taps away with an obvious path to get there.`;
 }
-

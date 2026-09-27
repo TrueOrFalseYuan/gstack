@@ -93,6 +93,12 @@ Understand the project and the area the user wants to change.
 
 {{LEARNINGS_SEARCH}}
 
+<!-- codex-astra -->
+5. Use the goal already stated by the user. If it is unclear, ask whether this is
+   a startup/internal product, a time-boxed demo, research/open source, learning,
+   or a personal project. Preserve all meaningful choices through the host's tool
+   or prose. Startup/internal product uses Phase 2A; the other goals use Phase 2B.
+<!-- otherwise -->
 5. **Ask: what's your goal with this?** This is a real question, not a formality. The answer determines everything about how the session runs.
 
    Via AskUserQuestion, ask:
@@ -110,6 +116,7 @@ Understand the project and the area the user wants to change.
    - Startup, intrapreneurship → **Startup mode** (Phase 2A)
    - Hackathon, open source, research, learning, having fun → **Builder mode** (Phase 2B)
 
+<!-- /codex-astra -->
 6. **Assess product stage** (only for startup/intrapreneurship modes):
    - Pre-product (idea stage, no users yet)
    - Has users (people using it, not yet paying)
@@ -449,7 +456,13 @@ Rules:
 
 Emit ONE AskUserQuestion that lists every alternative (A/B and optionally C) as numbered options, using the preamble's AskUserQuestion Format section. The AskUserQuestion call is a tool_use, not prose — write the question text and call the tool.
 
+<!-- codex-astra -->
+Wait for unresolved product or approach decisions before drafting dependent
+recommendations. Reuse decisions already made in this session; do not ask again
+solely because the workflow reached another confirmation step.
+<!-- otherwise -->
 **STOP.** Do NOT proceed to Phase 4.5 (Founder Signal Synthesis), Phase 5 (Design Doc), Phase 6 (Closing), or any design-doc generation until the user responds. A "clearly winning approach" is still an approach decision and still needs explicit user approval before it lands in the design doc. Writing the recommendation in chat prose and continuing forward is the failure mode this gate exists to prevent.
+<!-- /codex-astra -->
 
 ---
 
@@ -516,7 +529,13 @@ Confirm you Read every section the Section index named as applying to this run, 
 ## Important Rules
 
 - **Never start implementation.** This skill produces design docs, not code. Not even scaffolding.
+<!-- codex-astra -->
+- Ask diagnostic questions whose answers are still needed. Sequence questions
+  when one answer changes the next; batch independent missing facts. Do not
+  re-interrogate a specific answer already supported by evidence.
+<!-- otherwise -->
 - **Questions ONE AT A TIME.** Never batch multiple questions into one AskUserQuestion.
+<!-- /codex-astra -->
 - **The assignment is mandatory.** Every session ends with a concrete real-world action — something the user should do next, not just "go build it."
 - **If user provides a fully formed plan:** skip Phase 2 (questioning) but still run Phase 3 (Premise Challenge) and Phase 4 (Alternatives). Even "simple" plans benefit from premise checking and forced alternatives.
 - **Completion status:**

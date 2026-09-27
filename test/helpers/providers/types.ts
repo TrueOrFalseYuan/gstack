@@ -45,6 +45,11 @@ export interface RunResult {
   toolCalls: number;
   /** Actual model ID the provider reports using (may be a variant of the family). */
   modelUsed: string;
+  /** Selection and provenance; a requested model is not provider confirmation. */
+  requestedModel?: string;
+  modelSource?: 'provider' | 'unreported';
+  /** Do not guess an effort value inherited from CLI configuration. */
+  reasoningEffort?: 'inherited (not reported)';
   /** If the run failed, error code + human reason. output/tokens may be partial. */
   error?: { code: RunError; reason: string };
 }
@@ -70,5 +75,5 @@ export interface ProviderAdapter {
   /** Run a prompt and return normalized RunResult. Non-throwing. Errors go in result.error. */
   run(opts: RunOpts): Promise<RunResult>;
   /** Estimate USD cost for the reported token usage and model. */
-  estimateCost(tokens: TokenUsage, model?: string): number;
+  estimateCost(tokens: TokenUsage, model?: string): number | undefined;
 }

@@ -232,6 +232,15 @@ first:
 $B screenshot "$_DESIGN_DIR/current.png"
 ```
 
+<!-- codex-astra -->
+Generate the selected concepts using the documented designer command and the
+same product context, dimensions and reference assets. Use host-provided delegation
+only when available and permitted; otherwise generate sequentially. Each variant
+gets a distinct output path and its own concept brief, with common brand constraints.
+Respect provider concurrency limits and report per-variant failures without treating
+missing images as successful output. Preserve successful variants for the comparison
+board. Never invent `Agent` parameters or label a Codex subagent as Claude.
+<!-- otherwise -->
 **Launch N Agent subagents in a single message** (parallel execution). Use the Agent
 tool with `subagent_type: "general-purpose"` for each variant. Each agent is independent
 and handles its own generation, quality check, verification, and retry.
@@ -274,6 +283,7 @@ For the evolve path, replace step 1 with:
 failed with "The operation was aborted" while `--output /tmp/...` succeeded. This is
 a sandbox restriction. Always generate to `/tmp/` first, then `cp`.
 
+<!-- /codex-astra -->
 ### Step 3d: Results
 
 After all agents complete:

@@ -45,7 +45,13 @@ This skill exists for developers who:
 
 ## What it removes
 
+<!-- codex-astra -->
+Inventory the concrete removal set, then obtain any missing approval once for
+that set. Reuse prior approval covering these exact items. Ask again only if the
+inventory reveals additional scope or user-authored code that would be removed:
+<!-- otherwise -->
 Each item is reverted only after AskUserQuestion confirmation:
+<!-- /codex-astra -->
 
 1. The `DebugBridge` SPM target from `Package.swift`.
 2. The `#if DEBUG` block in the app's `@main` entry that calls
@@ -71,7 +77,12 @@ Each item is reverted only after AskUserQuestion confirmation:
    `StateAccessor.swift` files.
 4. Parse `Package.swift` for the DebugBridge dependency entry.
 5. Show the user what's about to be removed (file list + line counts).
+<!-- codex-astra -->
+   If this concrete set is not yet authorized, ask proceed, dry-run, or abort.
+   Otherwise continue within the approved set.
+<!-- otherwise -->
    AskUserQuestion: proceed, dry-run, or abort.
+<!-- /codex-astra -->
 
 ## Phase 2: Remove
 

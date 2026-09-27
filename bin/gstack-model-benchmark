@@ -8,6 +8,7 @@
  *
  * Options:
  *   --models claude,gpt,gemini   Comma-separated provider list (default: claude)
+ *   --gpt-model <model-id>       Explicit Codex runtime model; requires --models gpt
  *   --prompt "<text>"            Inline prompt instead of a file
  *   --workdir <path>             Working dir passed to each CLI (default: cwd)
  *   --timeout-ms <n>             Per-provider timeout (default: 300000)
@@ -41,7 +42,7 @@ const ADAPTER_FACTORIES = {
 type OutputFormat = 'table' | 'json' | 'markdown';
 
 const CLI_ARGS = process.argv.slice(2);
-const VALUE_FLAGS = new Set(['--models', '--prompt', '--workdir', '--timeout-ms', '--output']);
+const VALUE_FLAGS = new Set(['--models', '--gpt-model', '--prompt', '--workdir', '--timeout-ms', '--output']);
 
 function arg(name: string, def?: string): string | undefined {
   const idx = CLI_ARGS.findIndex(a => a === name || a.startsWith(name + '='));
@@ -106,6 +107,11 @@ async function main(): Promise<void> {
   const positional = positionalArgs(CLI_ARGS)[0];
   const prompt = resolvePrompt(positional);
   const providers = parseProviders(arg('--models'));
+  const gptModel = arg('--gpt-model');
+  const hasGptModel = CLI_ARGS.some(a => a === '--gpt-model' || a.startsWith('--gpt-model='));
+  if (hasGptModel && (!gptModel?.trim() || gptModel.startsWith('--') || !providers.includes('gpt'))) {
+    throw new Error('--gpt-model requires a nonempty model ID and gpt in --models');
+  }
   const workdir = arg('--workdir', process.cwd())!;
   const timeoutMs = parseInt(arg('--timeout-ms', '300000')!, 10);
   const output = (arg('--output', 'table') as OutputFormat);
@@ -114,7 +120,7 @@ async function main(): Promise<void> {
   const dryRun = flag('--dry-run');
 
   if (dryRun) {
-    await dryRunReport({ prompt, providers, workdir, timeoutMs, output, doJudge });
+    await dryRunReport({ prompt, providers, workdir, timeoutMs, output, doJudge, gptModel });
     return;
   }
 
@@ -124,6 +130,7 @@ async function main(): Promise<void> {
     providers,
     timeoutMs,
     skipUnavailable,
+    models: gptModel ? { gpt: gptModel } : undefined,
   };
 
   const report = await runBenchmark(input);
@@ -154,11 +161,17 @@ async function dryRunReport(opts: {
   timeoutMs: number;
   output: OutputFormat;
   doJudge: boolean;
+  gptModel?: string;
 }): Promise<void> {
   const lines: string[] = [];
   lines.push('== gstack-model-benchmark --dry-run ==');
   lines.push(`  prompt:     ${opts.prompt.length > 80 ? opts.prompt.slice(0, 80) + '…' : opts.prompt}`);
   lines.push(`  providers:  ${opts.providers.join(', ')}`);
+  if (opts.providers.includes('gpt')) {
+    lines.push(`  gpt_model:  ${opts.gptModel ?? 'CLI default (not resolved)'}`);
+    lines.push('  reasoning:  inherited from Codex configuration; not overridden');
+    lines.push('  model access is not verified by this dry run');
+  }
   lines.push(`  workdir:    ${opts.workdir}`);
   lines.push(`  timeout_ms: ${opts.timeoutMs}`);
   lines.push(`  output:     ${opts.output}`);

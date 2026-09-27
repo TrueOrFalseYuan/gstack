@@ -1,11 +1,18 @@
 ---
 name: unfreeze
 version: 0.1.0
+<!-- codex-astra -->
+description: |
+  Clear the gstack edit scope.
+  Instruction-level guidance for Codex; host sandbox and approval rules still apply.
+  Use when the user requests /unfreeze. (gstack)
+<!-- otherwise -->
 description: |
   Clear the freeze boundary set by /freeze, allowing edits to all directories
   again. Use when you want to widen edit scope without ending the session.
   Use when asked to "unfreeze", "unlock edits", "remove freeze", or
   "allow all edits". (gstack)
+<!-- /codex-astra -->
 triggers:
   - unfreeze edits
   - unlock all directories
@@ -16,6 +23,17 @@ allowed-tools:
 sensitive: true
 ---
 
+<!-- codex-astra -->
+{{PREAMBLE}}
+
+# /unfreeze — Clear the gstack edit scope
+
+Resolve the state location through `$GSTACK_BIN/gstack-paths`. If freeze-dir.txt
+exists under GSTACK_STATE_ROOT, read it and remove only that state file. Report the
+previous directory and that the gstack instruction-level edit restriction is cleared.
+If absent, report that no gstack edit scope was set. Host sandbox, repository rules
+and any remaining /careful checks still apply; this cannot grant filesystem access.
+<!-- otherwise -->
 # /unfreeze — Clear Freeze Boundary
 
 Remove the edit restriction set by `/freeze`, allowing edits to all directories.
@@ -42,3 +60,4 @@ fi
 Tell the user the result. Note that `/freeze` hooks are still registered for the
 session — they will just allow everything since no state file exists. To re-freeze,
 run `/freeze` again.
+<!-- /codex-astra -->

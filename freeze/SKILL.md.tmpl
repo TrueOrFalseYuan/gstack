@@ -1,12 +1,19 @@
 ---
 name: freeze
 version: 0.1.0
+<!-- codex-astra -->
+description: |
+  Apply an explicit directory scope to edits.
+  Instruction-level guidance for Codex; host sandbox and approval rules still apply.
+  Use when the user requests /freeze. (gstack)
+<!-- otherwise -->
 description: |
   Restrict file edits to a specific directory for the session. Blocks Edit and
   Write outside the allowed path. Use when debugging to prevent accidentally
   "fixing" unrelated code, or when you want to scope changes to one module.
   Use when asked to "freeze", "restrict edits", "only edit this folder",
   or "lock down edits". (gstack)
+<!-- /codex-astra -->
 triggers:
   - freeze edits to directory
   - lock editing scope
@@ -30,6 +37,25 @@ hooks:
 sensitive: true
 ---
 
+<!-- codex-astra -->
+{{PREAMBLE}}
+
+# /freeze — Explicit edit scope
+
+Use the directory specified in the request. If missing or ambiguous, ask for it
+using the host's text-capable question mechanism or prose; do not invent choices.
+Resolve it to a canonical absolute directory and show the concrete scope. Save it
+with a trailing slash in freeze-dir.txt under GSTACK_STATE_ROOT obtained from
+`$GSTACK_BIN/gstack-paths`. Reuse an already-set scope when that matches the request.
+
+Before edits or writes, including shell edits, verify their resolved paths remain
+inside the directory. Resolve symlinks so an in-scope link cannot silently target an
+out-of-scope file. Ask for an explicit scope change if the task needs files outside it.
+`/unfreeze` clears this gstack restriction. It does not relax host permissions.
+
+This is an instruction-level constraint in Codex. No Claude Edit/Write hook is
+installed and no tool-level hard block is promised. Report that limitation plainly.
+<!-- otherwise -->
 # /freeze — Restrict Edits to a Directory
 
 Lock file edits to a specific directory. Any Edit or Write operation targeting
@@ -84,3 +110,4 @@ script reads it on every Edit/Write invocation.
 - Freeze applies to Edit and Write tools only — Read, Bash, Glob, Grep are unaffected
 - This prevents accidental edits, not a security boundary — Bash commands like `sed` can still modify files outside the boundary
 - To deactivate, run `/unfreeze` or end the conversation
+<!-- /codex-astra -->

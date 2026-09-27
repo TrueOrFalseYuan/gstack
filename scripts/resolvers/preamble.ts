@@ -19,6 +19,7 @@
 import type { TemplateContext } from './types';
 import { generateModelOverlay } from './model-overlay';
 import { generateQuestionTuning } from './question-tuning';
+import { isCodexAstra, generateAstraPreamble } from './astra';
 
 // Core bootstrap
 import { generatePreambleBash } from './preamble/generate-preamble-bash';
@@ -80,6 +81,9 @@ export function generatePreamble(ctx: TemplateContext): string {
   const tier = ctx.preambleTier ?? 4;
   if (tier < 1 || tier > 4) {
     throw new Error(`Invalid preamble-tier: ${tier} in ${ctx.tmplPath}. Must be 1-4.`);
+  }
+  if (isCodexAstra(ctx)) {
+    return [generateAstraPreamble(ctx), generateModelOverlay(ctx)].join('\n\n');
   }
   const sections = [
     generatePreambleBash(ctx),

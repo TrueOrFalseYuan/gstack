@@ -122,6 +122,21 @@ OLD_VERSION=$(cat "$INSTALL_DIR/VERSION" 2>/dev/null || echo "unknown")
 
 Use the install type and directory detected in Step 2:
 
+<!-- codex-astra -->
+**For git installs** (global-git, local-git):
+
+Inspect the install's current branch, upstream, working tree and rendered profile.
+Fetch its configured upstream, then show the concrete target and any local divergence.
+For a clean branch that can fast-forward, update that branch with `git merge --ff-only`
+against its upstream. Do not reset an optimization branch to origin/main or silently
+stash user changes. If dirty, diverged or lacking an upstream, ask for the concrete
+resolution before changing it. Keep the existing installation usable on failure.
+
+Run setup after updating. If this installation used the explicit Astra profile,
+regenerate with `bun run gen:skill-docs --host codex --model gpt-6-astra` and verify
+its sections and profile marker. If the target does not support Astra, disclose the
+incompatibility before upgrading; do not silently install the default profile.
+<!-- otherwise -->
 **For git installs** (global-git, local-git):
 ```bash
 cd "$INSTALL_DIR"
@@ -132,6 +147,7 @@ git reset --hard origin/main
 ```
 If `$STASH_OUTPUT` contains "Saved working directory", warn the user: "Note: local changes were stashed. Run `git stash pop` in the skill directory to restore them."
 
+<!-- /codex-astra -->
 **For vendored installs** (vendored, vendored-global):
 ```bash
 PARENT=$(dirname "$INSTALL_DIR")

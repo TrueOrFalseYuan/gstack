@@ -24,10 +24,19 @@ triggers:
 
 This is the gstack router. Its one job is to send the request to the right skill.
 
+<!-- codex-astra -->
+1. Match the user's requested outcome to the routing rules below. QA and report-only
+   QA use their respective workflows; /browse is the browser command reference.
+2. Load a skill only when explicitly requested or when its workflow materially
+   helps this task. Inspecting a SKILL.md as source does not invoke that skill.
+3. Use the host's available skill mechanism, or read the generated sibling skill's
+   SKILL.md. If none is relevant, answer or perform the task directly.
+<!-- otherwise -->
 1. If the request is about a browser, QA, dogfooding, screenshots, or inspecting a page
    (open a site, test a deploy, take a screenshot, check a flow visually) → invoke `/browse`.
 2. Otherwise, route by the rules below. If nothing matches, answer directly.
 
+<!-- /codex-astra -->
 Best-effort, record which way you routed (never block on it). Set `ROUTE_OUTCOME` to
 `browse` (sent to /browse), `routed` (sent to another skill), or `direct` (answered
 directly, no skill matched):
@@ -39,12 +48,19 @@ If `PROACTIVE` is `false`: do NOT proactively invoke or suggest other gstack ski
 this session. Only run skills the user explicitly invokes. This preference persists across
 sessions via `gstack-config`.
 
+<!-- codex-astra -->
+If `PROACTIVE` is `true`, apply a relevant skill when it materially helps the
+request. Do not infer relevance solely from a keyword, filename or model name.
+
+**Routing rules — select a workflow by the requested outcome:**
+<!-- otherwise -->
 If `PROACTIVE` is `true` (default): **invoke the Skill tool** when the user's request
 matches a skill's purpose. Do NOT answer directly when a skill exists for the task.
 Use the Skill tool to invoke it. The skill has specialized workflows, checklists, and
 quality gates that produce better results than answering inline.
 
 **Routing rules — when you see these patterns, INVOKE the skill via the Skill tool:**
+<!-- /codex-astra -->
 - User describes a new idea, asks "is this worth building", brainstorms, pitches a concept → invoke `/office-hours`
 - User asks to spec something out, file an issue, write up a ticket, "turn this into a GitHub issue", "backlog item" → invoke `/spec`
 - User asks about strategy, scope, ambition, "think bigger", "what should we build" → invoke `/plan-ceo-review`
@@ -81,11 +97,16 @@ quality gates that produce better results than answering inline.
 - User asks to tune question sensitivity, "stop asking me that" → invoke `/plan-tune`
 - User asks for code quality dashboard, "health check" → invoke `/health`
 
+<!-- codex-astra -->
+When the task is already clear and no specialist workflow helps, proceed directly.
+Avoid chaining planning, security, QA or release skills without a task-specific reason.
+<!-- otherwise -->
 **When in doubt, invoke the skill.** A false positive (invoking a skill that wasn't
 needed) is cheaper than a false negative (answering ad-hoc when a structured workflow
 exists). The skill provides multi-step workflows, checklists, and quality gates that
 always produce better results than an ad-hoc answer. If no skill matches, answer
 directly as usual.
 
+<!-- /codex-astra -->
 If the user opts out of suggestions, run `gstack-config set proactive false`.
 If they opt back in, run `gstack-config set proactive true`.

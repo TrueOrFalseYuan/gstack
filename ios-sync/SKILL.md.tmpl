@@ -94,7 +94,11 @@ and platform triple all match the cache, this is a ~50ms no-op.
 
 | Symptom | Action |
 |---|---|
+<!-- codex-astra -->
+| Swift compile fails after regen | Diagnose the generated diff and compile error. Repair generated integration within scope; undo only this run's changes when necessary, preserving pre-existing edits. Report missing access or a material scope blocker. |
+<!-- otherwise -->
 | Swift compile fails after regen | Revert via `git restore` + AskUserQuestion: surface the compile error |
+<!-- /codex-astra -->
 | Codegen reports an invalid marked declaration | Use a file-scope observable class and a writable instance `var` with an explicit JSON-native type, internal/public setter, and a key unique across models; otherwise remove the `// @Snapshotable` marker. |
 | Schema hash unchanged after adding new @Observable | No field has the standalone `// @Snapshotable` marker comment — codegen excludes unmarked state correctly. Add the comment immediately above each field that should be snapshotted. |
 | Scanner sees generated bridge sources | Pass the narrow app source directory; the regenerator automatically excludes `DebugBridgeGenerated` and `StateAccessor.swift`. |

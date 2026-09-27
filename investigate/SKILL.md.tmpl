@@ -174,6 +174,12 @@ Before writing ANY fix, verify your hypothesis.
 
 2. **If the hypothesis is wrong:** Before forming the next hypothesis, consider searching for the error. **Sanitize first** — strip hostnames, IPs, file paths, SQL fragments, customer identifiers, and any internal/proprietary data from the error message. Search only the generic error type and framework context: "{component} {sanitized error type} {framework version}". If the error message is too specific to sanitize safely, skip the search. If WebSearch is unavailable, skip and proceed. Then return to Phase 1. Gather more evidence. Do not guess.
 
+<!-- codex-astra -->
+3. If hypotheses fail, use the new evidence to revise them. After three attempts
+   without new evidence or progress, reassess and report a focused blocker. Ask for
+   missing access, domain information or a material scope decision; do not ask the
+   user to guess a root cause that can be established experimentally.
+<!-- otherwise -->
 3. **3-strike rule:** If 3 hypotheses fail, **STOP**. Use AskUserQuestion:
    ```
    3 hypotheses tested, none match. This may be an architectural issue
@@ -184,6 +190,7 @@ Before writing ANY fix, verify your hypothesis.
    C) Add logging and wait — instrument the area and catch it next time
    ```
 
+<!-- /codex-astra -->
 **Red flags** — if you see any of these, slow down:
 - "Quick fix for now" — there is no "for now." Fix it right or escalate.
 - Proposing a fix before tracing data flow — you're guessing.
@@ -203,7 +210,12 @@ Once root cause is confirmed:
    - **Fails** without the fix (proves the test is meaningful)
    - **Passes** with the fix (proves the fix works)
 
+<!-- codex-astra -->
+4. Run the regression test and affected checks, plus the repository's mandatory
+   suite. Record commands and results. Broaden coverage when impact is uncertain.
+<!-- otherwise -->
 4. **Run the full test suite.** Paste the output. No regressions allowed.
+<!-- /codex-astra -->
 
 5. **If the fix touches >5 files:** Use AskUserQuestion to flag the blast radius:
    ```
@@ -219,7 +231,12 @@ Once root cause is confirmed:
 
 **Fresh verification:** Reproduce the original bug scenario and confirm it's fixed. This is not optional.
 
+<!-- codex-astra -->
+Use the successful checks for the current code state. Rerun when code changed,
+new failures appeared or a verification gap remains. Summarize relevant results.
+<!-- otherwise -->
 Run the test suite and paste the output.
+<!-- /codex-astra -->
 
 Output a structured debug report:
 ```
@@ -249,7 +266,12 @@ Log the investigation as a learning for future sessions. Use `type: "investigati
 
 ## Important Rules
 
+<!-- codex-astra -->
+- Reassess after three attempts without new evidence. Stop if further work needs
+  unavailable input, unsafe access or a scope change; preserve the diagnostic evidence.
+<!-- otherwise -->
 - **3+ failed fix attempts → STOP and question the architecture.** Wrong architecture, not failed hypothesis.
+<!-- /codex-astra -->
 - **Never apply a fix you cannot verify.** If you can't reproduce and confirm, don't ship it.
 - **Never say "this should fix it."** Verify and prove it. Run the tests.
 - **If fix touches >5 files → AskUserQuestion** about blast radius before proceeding.

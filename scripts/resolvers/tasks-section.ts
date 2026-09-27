@@ -8,6 +8,7 @@
  */
 
 import type { TemplateContext, ResolverFn } from './types';
+import { isCodexAstra } from './astra';
 
 const VALID_PHASES = new Set(['ceo-review', 'design-review', 'eng-review', 'devex-review']);
 
@@ -16,6 +17,15 @@ export const generateTasksSectionEmit: ResolverFn = (_ctx: TemplateContext, args
   if (!phase || !VALID_PHASES.has(phase)) {
     throw new Error(`TASKS_SECTION_EMIT requires one of ${[...VALID_PHASES].join(', ')} — got ${phase}`);
   }
+
+  if (isCodexAstra(_ctx)) return `## Implementation Tasks
+
+Synthesize actionable tasks from verified ${phase} findings. Include priority,
+component, concrete change, relevant files, dependencies and verification. Label
+effort as an estimate when useful; do not use a fixed human/AI compression ratio.
+No findings means no new tasks. In plan mode include tasks in the proposed plan
+without JSONL, TODOS.md or plan-file writes. In execution mode use an authorized
+artifact destination when requested; file emission is not a completion gate.`;
 
   return `## Implementation Tasks
 

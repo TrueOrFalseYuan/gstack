@@ -227,6 +227,18 @@ If the fix involved JS behavior: follow the same procedure as /qa Phase 8e.5 (st
 test patterns, write a regression test encoding the exact bug condition, run it, commit if
 passes or defer if fails). Commit format: `test(design): regression test for FINDING-NNN`.
 
+<!-- codex-astra -->
+### 8f. Scope and progress check
+
+After a revert or a group of fixes, compare actual changes and evidence with the
+approved target. Continue verified repairs within scope. Pause for unrelated changes,
+new product decisions, unavailable verification or repeated regressions without
+progress. Describe the concrete issue; do not present invented risk percentages.
+Preserve the workflow limit of 30 fixes per invocation and report remaining work
+when that limit is reached. Do not treat a pending scope decision as permission.
+
+---
+<!-- otherwise -->
 ### 8f. Self-Regulation (STOP AND EVALUATE)
 
 Every 5 fixes (or after any revert), compute the design-fix risk level:
@@ -247,6 +259,7 @@ DESIGN-FIX RISK:
 
 ---
 
+<!-- /codex-astra -->
 ## Phase 9: Final Design Audit
 
 After all fixes are applied:
@@ -307,6 +320,11 @@ If the repo has a `TODOS.md`:
 12. **One commit per fix.** Never bundle multiple design fixes into one commit.
 13. **Only modify tests when generating regression tests in Phase 8e.5.** Never modify CI configuration. Never modify existing tests — only create new test files.
 14. **Revert on regression.** If a fix makes things worse, `git revert HEAD` immediately.
+<!-- codex-astra -->
+15. Reassess scope and progress using evidence, preserving the user's design
+direction and the documented fix limit.
+<!-- otherwise -->
 15. **Self-regulate.** Follow the design-fix risk heuristic. When in doubt, stop and ask.
+<!-- /codex-astra -->
 16. **CSS-first.** Prefer CSS/styling changes over structural component changes. CSS-only changes are safer and more reversible.
 17. **DESIGN.md export.** You MAY write a DESIGN.md file if the user accepts the offer from Phase 2.

@@ -86,8 +86,14 @@ For each screen in the app, score 0-10 and explain what would push it to 10:
    - Record findings.
 3. Produce a markdown report with screenshots, scores per screen, and a
    "biggest leverage fix" suggestion per dimension.
+<!-- codex-astra -->
+4. Present low-scoring dimensions together with evidence and recommended fixes.
+   The audit remains read-only. Ask only when the user wants to choose remediation
+   scope; a low score alone does not require interrupting the report.
+<!-- otherwise -->
 4. Use AskUserQuestion for any score < 7 — present the issue with
    recommended fix + tradeoff so the user can decide whether to address.
+<!-- /codex-astra -->
 
 ## Output
 
